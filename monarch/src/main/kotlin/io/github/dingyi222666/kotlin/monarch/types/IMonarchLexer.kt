@@ -19,12 +19,40 @@
 package io.github.dingyi222666.kotlin.monarch.types
 
 interface IMonarchLexer : IMonarchLexerMin {
-    val maxStack: Int
-    val start: String?
+    var maxStack: Int
+    var start: String?
+    var tokenPostfix: String
+
+    var tokenizer: MutableMap<String, MutableList<MonarchRule>>
+    var brackets: List<MonarchLanguageBracket>
+
     override var ignoreCase: Boolean
     override var unicode: Boolean
-    val tokenPostfix: String
+}
 
-    val tokenizer: Map<String, List<MonarchRule>>
-    val brackets: List<MonarchLanguageRule>
+class MonarchLexer(
+    override val languageId: String,
+    private val attrGet: (attr: String) -> Any?
+) : IMonarchLexer {
+    override var maxStack: Int = 0
+
+    override var start: String? = null
+
+    override var tokenPostfix: String = ""
+
+    override var tokenizer: MutableMap<String, MutableList<MonarchRule>> = mutableMapOf()
+
+    override var brackets: List<MonarchLanguageBracket> = listOf()
+
+    override var ignoreCase: Boolean = false
+
+    override var unicode: Boolean = false
+
+    override var includeLF: Boolean = true
+    override var noThrow: Boolean = false
+    override var usesEmbedded: Boolean = false
+    override var defaultToken: String = ""
+    override var stateNames: Map<String, Any> = mapOf()
+
+    override fun get(attr: String): Any? = attrGet(attr)
 }

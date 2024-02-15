@@ -30,19 +30,19 @@ package io.github.dingyi222666.kotlin.monarch.types
 // A Monarch language definition
 interface IMonarchLanguage {
     // map from string to ILanguageRule[]
-    val tokenizer: Map<String, List<MonarchLanguageRule>>
+    val tokenizer: MutableMap<String, MutableList<MonarchLanguageRule>>?
 
     // is the language case-insensitive?
     var ignoreCase: Boolean?
 
-    // is the language unicode-aware? (i.e., /\u{1D306}/)
+    // is the language unicode-aware? (i.e., /\u{1D306}/). Defaults to true.
     var unicode: Boolean?
 
     // if no match in the tokenizer assign this token class (default 'source')
     val defaultToken: String?
 
     // for example [['{','}','delimiter.curly']]
-    val brackets: List<MonarchLanguageBracket>?
+    val brackets: MutableList<MonarchLanguageBracket>?
 
     // start symbol in the tokenizer (by default the first entry is used)
     val start: String?

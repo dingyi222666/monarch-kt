@@ -28,19 +28,19 @@
 package io.github.dingyi222666.kotlin.monarch.types
 
 sealed interface MonarchFuzzyAction {
-    class ActionString(val action: String) : MonarchFuzzyAction
+    class ActionString(var action: String) : MonarchFuzzyAction
 
     data class ActionBase(
-        val group: List<MonarchFuzzyAction>? = null,
-        val test: ((id: String, matches: List<String>, state: String, eos: Boolean) -> MonarchFuzzyAction)? = null,
-        val token: String? = null,
-        val tokenSubst: Boolean? = null,
-        val next: String? = null,
-        val switchTo: String? = null,
-        val goBack: Int? = null,
-        val bracket: MonarchBracket? = null,
-        val nextEmbedded: String? = null,
-        val log: String? = null,
-        val transform: ((states: List<String>) -> List<String>)? = null
+        var group: List<MonarchFuzzyAction>? = null,
+        var test: ((id: String, matches: List<String>, state: String, eos: Boolean) -> MonarchFuzzyAction)? = null,
+        var token: String? = null,
+        var tokenSubst: Boolean? = null,
+        var next: String? = null,
+        var switchTo: String? = null,
+        var goBack: Int? = null,
+        var bracket: MonarchBracketStatus? = null,
+        var nextEmbedded: String? = null,
+        var log: String? = null,
+        var transform: ((states: List<String>) -> List<String>)? = null
     ) : MonarchFuzzyAction
 }

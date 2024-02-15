@@ -20,7 +20,6 @@
  * Initial license: MIT
  *
  * Contributors:
- * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
  * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
 
@@ -29,6 +28,7 @@ package io.github.dingyi222666.kotlin.monarch.extension
 
 import io.github.dingyi222666.kotlin.monarch.types.IMonarchLexer
 import io.github.dingyi222666.kotlin.monarch.types.IMonarchLexerMin
+import io.github.dingyi222666.kotlin.monarch.types.MonarchException
 import io.github.dingyi222666.kotlin.monarch.types.MonarchRule
 import java.util.*
 
@@ -56,12 +56,12 @@ internal fun String.sanitize(): String {
  *
  * See documentation for more info
  */
-fun IMonarchLexerMin.substituteMatches(str: String, id: String, matches: Array<String>, state: String): String {
+fun IMonarchLexerMin.substituteMatches(str: String, id: String, matches: List<String>, state: String): String {
     val re = Regex("\\$((\\$)|(#)|(\\d\\d?)|[sS](\\d\\d?)|@(\\w+))")
 
     var stateMatches: MutableList<String>? = null
     return str.replace(re) { matchResult ->
-        val (sub, dollar, hash, n, s, attr) = matchResult.destructured
+        val (_, dollar, hash, n, s, attr) = matchResult.destructured
         if (dollar.isNotEmpty()) {
             return@replace "$" // $$
         }
@@ -131,4 +131,8 @@ fun IMonarchLexerMin.stateExists(inState: String): Boolean {
         }
     }
     return false
+}
+
+fun IMonarchLexerMin.createError(msg: String): MonarchException {
+    return MonarchException("${languageId}: $msg")
 }

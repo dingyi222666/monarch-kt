@@ -27,24 +27,29 @@
 
 package io.github.dingyi222666.kotlin.monarch.types
 
+import io.github.dingyi222666.kotlin.monarch.extension.UnionType
+
 
 sealed interface MonarchLanguageRule {
     data class ShortRule1(
-        val regex: String,
-        val action: MonarchLanguageAction
-    ) : MonarchLanguageRule
+        override val regex: UnionType<String, Regex>,
+        override val action: MonarchLanguageAction
+    ) : MonarchLanguageRule, ShortRule
 
     data class ShortRule2(
-        val regex: String,
-        val action: MonarchLanguageAction,
+        override val regex: UnionType<String, Regex>,
+        override val action: MonarchLanguageAction,
         val nextState: String
-    ) : MonarchLanguageRule
+    ) : MonarchLanguageRule, ShortRule
 
     data class ExpandedLanguageRule(
-        val regex: String?,
-        val action: MonarchLanguageAction?,
-        val include: String?
+        val include: String
     ) : MonarchLanguageRule
+
+    interface ShortRule {
+        val regex: UnionType<String, Regex>
+        val action: MonarchLanguageAction
+    }
 }
 
 
