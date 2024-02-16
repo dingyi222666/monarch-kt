@@ -45,7 +45,7 @@ sealed interface MonarchLanguageAction {
         val token: String? = null,
 
         // the next state to push, or "@push", "@pop", "@popall"
-        val next: String? = null,
+        var next: String? = null,
 
         // switch to this state
         val switchTo: String? = null,

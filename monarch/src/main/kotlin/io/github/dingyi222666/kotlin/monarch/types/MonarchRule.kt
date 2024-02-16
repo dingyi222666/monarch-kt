@@ -29,7 +29,7 @@ package io.github.dingyi222666.kotlin.monarch.types
 
 import io.github.dingyi222666.kotlin.monarch.common.compileAction
 import io.github.dingyi222666.kotlin.monarch.common.compileRegExp
-import io.github.dingyi222666.kotlin.monarch.extension.createError
+import io.github.dingyi222666.kotlin.monarch.extension.*
 
 /**
  * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L70)
@@ -52,10 +52,10 @@ class MonarchRule(
     override val name: String
         get() = innerName
 
-    fun setRegex(lexer: IMonarchLexerMin, regexArg: Any) {
-        val currentRegex = when (regexArg) {
-            is String -> regexArg
-            is Regex -> regexArg.pattern
+    fun setRegex(lexer: IMonarchLexerMin, regexArg: UnionType<String, Regex>) {
+        val currentRegex = when {
+            regexArg.isLeft -> regexArg.left
+            regexArg.isRight -> regexArg.right.pattern
             else -> throw lexer.createError("rules must start with a match string or regular expression: ${this.name}")
         }
 

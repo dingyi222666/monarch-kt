@@ -432,7 +432,7 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
                 throw lexer.createError("a rule must be a string or an object, in rule: $state")
             }
 
-            newRule.setRegex(lexerMin, rule.regex.value)
+            newRule.setRegex(lexerMin, rule.regex)
 
             val action = rule.action
 

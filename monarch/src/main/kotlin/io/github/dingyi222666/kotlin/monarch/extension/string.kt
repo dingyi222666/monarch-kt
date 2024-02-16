@@ -45,3 +45,7 @@ internal fun createKeywordMatcher(arr: List<String>, caseInsensitive: Boolean = 
         }
     }
 }
+
+internal fun String.splitSpaceToList(): List<String> {
+    return this.split(" ").toList()
+}
