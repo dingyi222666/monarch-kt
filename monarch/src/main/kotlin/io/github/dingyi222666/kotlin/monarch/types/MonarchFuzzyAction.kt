@@ -35,8 +35,6 @@ sealed interface MonarchFuzzyAction {
     value class ActionString(val action: String) : MonarchFuzzyAction
 
     data class ActionBase(
-        var group: List<MonarchFuzzyAction>? = null,
-        var test: ((id: String, matches: List<String>, state: String, eos: Boolean) -> MonarchFuzzyAction)? = null,
         var token: String? = null,
         var tokenSubst: Boolean? = null,
         var next: String? = null,
@@ -45,6 +43,7 @@ sealed interface MonarchFuzzyAction {
         var bracket: MonarchBracketType? = null,
         var nextEmbedded: String? = null,
         var log: String? = null,
+        var test: ((id: String, matches: List<String>, state: String, eos: Boolean) -> MonarchFuzzyAction)? = null,
         var transform: ((states: List<String>) -> List<String>)? = null
     ) : MonarchFuzzyAction
 

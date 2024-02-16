@@ -139,12 +139,13 @@ fun IMonarchLexer.findBracket(matched: String?): MonarchBracket? {
     }
 
     val fixCaseMatched = fixCase(matched)
-
     val brackets = brackets
+
+    println(matched)
     for (bracket in brackets) {
-        if (bracket.open === fixCaseMatched) {
+        if (bracket.open == fixCaseMatched) {
             return MonarchBracket(token = bracket.token, bracketType = MonarchBracketType.Open)
-        } else if (bracket.close === fixCaseMatched) {
+        } else if (bracket.close == fixCaseMatched) {
             return MonarchBracket(token = bracket.token, bracketType = MonarchBracketType.Close)
         }
     }

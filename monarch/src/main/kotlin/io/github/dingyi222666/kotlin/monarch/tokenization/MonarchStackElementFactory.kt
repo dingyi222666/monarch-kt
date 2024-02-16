@@ -39,7 +39,7 @@ object MonarchStackElementFactory {
             // no caching above a certain depth
             return MonarchStackElement(parent, state)
         }
-        val stackElementId = MonarchStackElement.getStackElementId(parent!!)
+        val stackElementId = MonarchStackElement.getStackElementId(parent)
         val fullId = when {
             stackElementId.isNotEmpty() -> "$stackElementId|"
             else -> ""

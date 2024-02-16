@@ -9,3 +9,13 @@ the 'advanced' topic sections of this document. On a first read, it is safe to s
 Advanced) since many of the advanced features are rarely used in most language definitions.
 
 ## _work in progress_
+
+## Features
+
+- A simple syntax definition based on regular expressions, powered by the monarch highlighting library
+- Define highlighting syntax with elegant Kotlin DSL (json file definition will be supported soon, still in development)
+- Minimal implementation, only provides basic analysis, easy to integrate into your project
+
+## Usage
+
+

@@ -45,7 +45,7 @@ class MonarchClassicTokensCollector : IMonarchTokensCollector {
     }
 
     override fun emit(startOffset: Int, type: String) {
-        if (this.lastTokenType === type && lastTokenLanguage === languageId) {
+        if (this.lastTokenType == type && lastTokenLanguage == languageId) {
             return
         }
         lastTokenType = type

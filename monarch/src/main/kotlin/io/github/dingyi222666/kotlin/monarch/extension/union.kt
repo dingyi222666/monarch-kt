@@ -18,7 +18,8 @@
 
 package io.github.dingyi222666.kotlin.monarch.extension
 
-open class UnionType<A, B>(open val value: Any)
+@JvmInline
+value class UnionType<A, B>(val value: Any)
 
 inline val <reified A> UnionType<A, *>.isLeft: Boolean
     get() = value is A
@@ -38,13 +39,3 @@ inline val <reified A> UnionType<A, *>.left: A
 inline val <reified A> UnionType<A, *>.leftOrNull: A?
     get() = value as? A
 
-class MutableUnionType<A : Any, B : Any>(override var value: Any) : UnionType<A, B>(value) {
-
-    fun setLeft(left: A) {
-        value = left
-    }
-
-    fun setRight(right: B) {
-        value = right
-    }
-}

@@ -71,6 +71,7 @@ class MonarchLanguageScope {
             includeLF = this@MonarchLanguageScope.includeLF
             tokenPostfix = this@MonarchLanguageScope.tokenPostfix
             start = this@MonarchLanguageScope.start
+            tokenizer = this@MonarchLanguageScope.tokenizer
         }
     }
 

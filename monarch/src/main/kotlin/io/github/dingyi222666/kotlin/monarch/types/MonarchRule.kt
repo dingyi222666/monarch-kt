@@ -72,6 +72,6 @@ class MonarchRule(
     }
 
     fun setAction(lexer: IMonarchLexerMin, act: Any) {
-        this.action = lexer.compileAction(this.name, act)
+        this.action = lexer.compileAction(innerName, act)
     }
 }

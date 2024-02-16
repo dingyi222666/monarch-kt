@@ -52,10 +52,16 @@ fun IMonarchLexerMin.compileRegExp(str: String): Regex {
         str = str.replace("@(\\w+)".toRegex()) { matchResult ->
             val attr = matchResult.groupValues[1]
             hadExpansion = true
-            val sub: String
-            when (val value = this[attr]) {
-                is String -> sub = value
-                // is RegExp -> sub = value.source
+            val sub = when (val value = this[attr]) {
+                is String -> value
+                is Regex -> value.pattern
+                is UnionType<*, *> -> {
+                    val unionValue = value as UnionType<String, Regex>
+                    if (unionValue.isLeft) {
+                        unionValue.left
+                    } else unionValue.right.pattern
+                }
+
                 else -> {
                     if (value == null) {
                         throw MonarchException(
@@ -235,9 +241,7 @@ fun IMonarchLexerMin.compileAction(ruleName: String, action: Any?): MonarchFuzzy
             results.add(compileAction(ruleName, a))
         }
 
-        return MonarchFuzzyAction.ActionBase(
-            group = results
-        )
+        return MonarchFuzzyAction.ActionArray(results)
     }
 
     if (action !is MonarchLanguageAction) {
@@ -273,7 +277,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
                     value = compiledValue,
                     test = null,
                 )
-            } else if (caseKey === "@eos") {
+            } else if (caseKey == "@eos") {
                 MonarchBranch(
                     name = caseKey,
                     value = compiledValue,
@@ -302,7 +306,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
                     }
                 }
                 return@ActionBase defaultAction
-            }
+            },
         )
     }
 
@@ -344,8 +348,9 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
                 if (next[0] == '@') {
                     newNext = next.substring(1) // peel off starting @ sign
                 }
-                if (next.indexOf('$') < 0) {  // no dollar substitution, we can check if the state exists
-                    if (!stateExists(substituteMatches(next, "", emptyList(), ""))) {
+
+                if (newNext.indexOf('$') < 0) {  // no dollar substitution, we can check if the state exists
+                    if (!stateExists(substituteMatches(newNext, "", emptyList(), ""))) {
                         throw createError("the next state ${action.next} is not defined in rule: $ruleName")
                     }
                 }
@@ -461,6 +466,8 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
             } else {
                 newRule.setAction(lexerMin, action)
             }
+
+            newRules.add(newRule)
         }
     }
 
@@ -476,23 +483,23 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
             mutableListOf()
         }
         addRules("tokenizer.$key", prepareAddList, value)
+        lexerTokenizer[key] = prepareAddList
 
     }
     lexer.usesEmbedded = lexer.usesEmbedded  // can be set during compileAction
 
     // TODO: DSL Style
-    val brackets = brackets ?: listOf(
+    val brackets = if (brackets != null && brackets?.isNotEmpty() == true) requireNotNull(brackets) else listOf(
         MonarchLanguageBracket("{", "}", "delimiter.curly"),
         MonarchLanguageBracket("[", "]", "delimiter.square"),
         MonarchLanguageBracket("(", ")", "delimiter.parenthesis"),
         MonarchLanguageBracket("<", ">", "delimiter.angle"),
     )
 
-
     val newBrackets = mutableListOf<MonarchLanguageBracket>()
 
     for (bracket in brackets) {
-        if (bracket.open === bracket.close) {
+        if (bracket.open == bracket.close) {
             throw lexer.createError("open and close brackets in a 'brackets' attribute must be different: ${bracket.open} \n hint: use the 'bracket' attribute if matching on equal brackets is required.")
         }
 
@@ -514,7 +521,8 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
         lexer.brackets = brackets
     }
 
-    lexer.brackets = brackets
+    println(lexer.brackets)
+
 
     // Disable throw so the syntax highlighter goes, no matter what
     lexer.noThrow = true

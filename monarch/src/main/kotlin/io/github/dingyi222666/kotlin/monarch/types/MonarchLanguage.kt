@@ -38,4 +38,10 @@ internal class MonarchLanguage : IMonarchLanguage {
     override fun get(key: String): Any? {
         return attrMap[key]
     }
+
+    override fun toString(): String {
+        return "MonarchLanguage(tokenizer=$tokenizer, ignoreCase=$ignoreCase, unicode=$unicode, defaultToken=$defaultToken, brackets=$brackets, start=$start, tokenPostfix=$tokenPostfix, includeLF=$includeLF, attrMap=$attrMap)"
+    }
+
+
 }

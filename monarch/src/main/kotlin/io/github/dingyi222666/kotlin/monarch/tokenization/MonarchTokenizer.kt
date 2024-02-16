@@ -33,7 +33,7 @@ import io.github.dingyi222666.kotlin.monarch.types.*
  * Source from [here](https://github.com/microsoft/vscode/blob/233fd797c0878a551994e55f1e87c23f5a200969/src/vs/editor/standalone/common/monarch/monarchLexer.ts#L390C14-L390C31)
  */
 class MonarchTokenizer(
-     val language: Language,
+    val language: Language,
     private val lexer: IMonarchLexer,
     private val maxTokenizationLineLength: Int = 5000
 ) : ITokenizationSupport {
@@ -219,8 +219,9 @@ class MonarchTokenizer(
                 val restOfLine = line.substring(pos)
                 for (rule in rules) {
                     if (pos == 0 || !rule.matchOnlyAtLineStart) {
-                        matches = rule.regex.find(restOfLine)?.groupValues
-                        if (matches != null) {
+                        val currentMatches = rule.regex.find(restOfLine)?.groupValues
+                        if (currentMatches != null) {
+                            matches = currentMatches
                             matched = matches[0]
                             action = rule.action
                         }
@@ -262,9 +263,9 @@ class MonarchTokenizer(
             // set the result: either a string or an array of actions
             if (action is MonarchFuzzyAction.ActionString || action is MonarchFuzzyAction.ActionArray) {
                 result = action
-            } else if (action is MonarchFuzzyAction.ActionBase && action.group != null) {
+            } /*else if (action is MonarchFuzzyAction.ActionBase && action.group != null) {
                 result = MonarchFuzzyAction.ActionArray(action.group!!)
-            } else if (action is MonarchFuzzyAction.ActionBase && action.token != null) {
+            } */else if (action is MonarchFuzzyAction.ActionBase && action.token != null) {
                 val token = action.token ?: throw lexer.createError("invalid token action: ${action.token}")
                 // do $n replacements?
                 result = if (action.tokenSubst == true) {
@@ -332,7 +333,7 @@ class MonarchTokenizer(
                         } else {
                             stack = stack.push(state)
                         }
-                    } else if (action.next === "@pop") {
+                    } else if (action.next == "@pop") {
                         if (stack.depth <= 1) {
                             throw lexer.createError(
                                 "trying to pop an empty stack in rule: " + safeRuleName(rule)
@@ -377,7 +378,7 @@ class MonarchTokenizer(
             }
 
             // check result
-            if (result === null) {
+            if (result == null) {
                 throw lexer.createError("lexer rule has no well-defined action in rule: " + this.safeRuleName(rule))
             }
 
@@ -455,8 +456,9 @@ class MonarchTokenizer(
                     ) {
                         continue
                     } else {
+                        println(result)
                         throw lexer.createError(
-                            "no progress in tokenizer in rule: " + this.safeRuleName(rule)
+                            "no progress in tokenizer in rule: " + safeRuleName(rule)
                         )
                     }
                 }
@@ -524,10 +526,7 @@ class MonarchTokenizer(
     }
 
     private fun safeRuleName(rule: IMonarchRule?): String {
-        if (rule != null) {
-            return rule.name
-        }
-        return "(unknown)"
+        return rule?.name ?: "(unknown)"
     }
 
     private fun getNestedEmbeddedLanguageData(languageId: String): EmbeddedLanguageData {
