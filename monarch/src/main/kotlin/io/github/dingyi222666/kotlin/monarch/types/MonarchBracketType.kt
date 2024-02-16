@@ -14,29 +14,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Initial code from https://github.com/microsoft/vscode
- * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
- * Initial license: MIT
- *
- * Contributors:
- * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
- * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
+
 
 package io.github.dingyi222666.kotlin.monarch.types
 
 /**
- * This class can be shortened as an array, ie. ['{','}','delimiter.curly']
- * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchTypes.ts#L135)
+ * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L17)
  */
-data class MonarchLanguageBracket(
-    // open bracket
-    val open: String,
-
-    // closing bracket
-    val close: String,
-
-    // token class
-    val token: String
-)
+enum class MonarchBracketType(val value: Int) {
+    None(0),
+    Open(1),
+    Close(-1)
+}

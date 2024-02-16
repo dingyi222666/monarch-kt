@@ -18,6 +18,9 @@
 
 package io.github.dingyi222666.kotlin.monarch.types
 
+/**
+ * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L96)
+ */
 data class MonarchBranch(
     val name: String,
     val value: MonarchFuzzyAction,

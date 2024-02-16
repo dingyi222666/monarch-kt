@@ -27,9 +27,12 @@
 
 package io.github.dingyi222666.kotlin.monarch.types
 
-
+/**
+ * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchTypes.ts#L55-L130)
+ */
 sealed interface MonarchLanguageAction {
-    data class ShortLanguageAction(val action: String) : MonarchLanguageAction
+    @JvmInline
+    value class ShortLanguageAction(val action: String) : MonarchLanguageAction
 
     data class ExpandedLanguageAction(
         // array of actions for each parenthesized match group
@@ -61,20 +64,8 @@ sealed interface MonarchLanguageAction {
     ) : MonarchLanguageAction
 
 
-    data class ActionArray(val actions: Array<out MonarchLanguageAction>) : MonarchLanguageAction {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as ActionArray
-
-            return actions.contentEquals(other.actions)
-        }
-
-        override fun hashCode(): Int {
-            return actions.contentHashCode()
-        }
-    }
+    @JvmInline
+    value class ActionArray(val actions: List<MonarchLanguageAction>) : MonarchLanguageAction
 }
 
 

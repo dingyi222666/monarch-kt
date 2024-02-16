@@ -18,29 +18,34 @@
 
 package io.github.dingyi222666.kotlin.monarch.extension
 
-class UnionType<A,B>(val value: Any) {
+open class UnionType<A, B>(open val value: Any) {
+    inline val <reified A> UnionType<A, B>.isLeft: Boolean
+        get() = value is A
 
-    inline fun <reified A> isLeft(): Boolean {
-        return value is A
+    inline val <reified B> UnionType<A, B>.isRight: Boolean
+        get() = value is B
+
+    inline val <reified B> UnionType<A, B>.right: B
+        get() = value as B
+
+    inline val <reified B> UnionType<A, B>.rightOrNull: B?
+        get() = value as? B
+
+    inline val <reified A> UnionType<A, B>.left: A
+        get() = value as A
+
+    inline val <reified A> UnionType<A, B>.leftOrNull: A?
+        get() = value as? A
+}
+
+
+class MutableUnionType<A : Any, B : Any>(override var value: Any) : UnionType<A, B>(value) {
+
+    fun setLeft(left: A) {
+        value = left
     }
 
-    inline fun <reified B> isRight(): Boolean {
-        return value is B
-    }
-
-    inline fun <reified A> asLeft(): A {
-        return value as A
-    }
-
-    inline fun <reified B> asRight(): B {
-        return value as B
-    }
-
-    inline fun <reified A> asLeftOrNull(): A? {
-        return value as? A
-    }
-
-    inline fun <reified B> asRightOrNull(): B? {
-        return value as? B
+    fun setRight(right: B) {
+        value = right
     }
 }

@@ -18,31 +18,28 @@
  * Initial code from https://github.com/microsoft/vscode
  * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
  * Initial license: MIT
- *
- * Contributors:
- * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
- * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
 
+package io.github.dingyi222666.kotlin.monarch.tokenization
 
-package io.github.dingyi222666.kotlin.monarch.types
+import io.github.dingyi222666.kotlin.monarch.types.TokenizeState
 
 /**
- * Minimal interface for a Monarch lexer.
+ * Embedded language data.
  *
- * Source from [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L23)
+ * Source from [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchLexer.ts#L128C7-L128C28)
  */
-interface IMonarchLexerMin {
-    val languageId: String
-    var includeLF: Boolean
-    var noThrow: Boolean
-    var ignoreCase: Boolean
-    var unicode: Boolean
-    var usesEmbedded: Boolean
-    var defaultToken: String
-    var stateNames: Map<String, Any>
+data class EmbeddedLanguageData(
+    val languageId: String,
+    val state: TokenizeState
+) : TokenizeState {
 
-    // Other keys that can be referred to by the tokenizer.
-    @Suppress("UNUSED")
-    operator fun get(attr: String): Any?
+    override fun clone(): EmbeddedLanguageData {
+        val stateClone = this.state.clone()
+        // save an object
+        if (stateClone === this.state) {
+            return this
+        }
+        return EmbeddedLanguageData(this.languageId, this.state)
+    }
 }

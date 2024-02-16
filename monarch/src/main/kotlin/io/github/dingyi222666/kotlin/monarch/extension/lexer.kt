@@ -20,43 +20,38 @@
  * Initial license: MIT
  *
  * Contributors:
+ * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
  * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
 
-
 package io.github.dingyi222666.kotlin.monarch.extension
 
-import io.github.dingyi222666.kotlin.monarch.types.IMonarchLexer
-import io.github.dingyi222666.kotlin.monarch.types.IMonarchLexerMin
-import io.github.dingyi222666.kotlin.monarch.types.MonarchException
-import io.github.dingyi222666.kotlin.monarch.types.MonarchRule
+import io.github.dingyi222666.kotlin.monarch.types.*
 import java.util.*
 
-/**
- * Puts a string to lower case if 'ignoreCase' is set.
- */
-fun IMonarchLexerMin.fixCase(str: String): String =
-    if (ignoreCase) str.lowercase(Locale.getDefault()) else str
+// https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCompile.ts
+
+/** Puts a string to lower case if 'ignoreCase' is set. */
+fun IMonarchLexerMin.fixCase(str: String): String = if (ignoreCase) str.lowercase(Locale.getDefault()) else str
 
 private val sanitizeRegex = Regex("[&<>'\"_]")
 
 internal fun String.sanitize(): String {
-    return replace(sanitizeRegex, "-"); // used on all output token CSS classes
+    return replace(sanitizeRegex, "-") // used on all output token CSS classes
 }
-
 
 // Helper functions for rule finding and substitution
 
 /**
- * substituteMatches is used on lexer strings and can substitutes predefined patterns:
- * 		$$  => $
- * 		$#  => id
- * 		$n  => matched entry n
- * 		@attr => contents of lexer[attr]
+ * substituteMatches is used on lexer strings and can substitutes predefined patterns: $$ => $ $# =>
+ * id $n => matched entry n
+ * @attr => contents of lexer.attr
  *
  * See documentation for more info
  */
-fun IMonarchLexerMin.substituteMatches(str: String, id: String, matches: List<String>, state: String): String {
+fun IMonarchLexerMin.substituteMatches(
+    str: String, id: String, matches: List<String>, state: String
+): String {
     val re = Regex("\\$((\\$)|(#)|(\\d\\d?)|[sS](\\d\\d?)|@(\\w+))")
 
     var stateMatches: MutableList<String>? = null
@@ -66,13 +61,13 @@ fun IMonarchLexerMin.substituteMatches(str: String, id: String, matches: List<St
             return@replace "$" // $$
         }
         if (hash.isNotEmpty()) {
-            return@replace fixCase(id)   // default $#
+            return@replace fixCase(id) // default $#
         }
         if (n.isNotEmpty() && n.toInt() < matches.size) {
             return@replace fixCase(matches[n.toInt()]) // $n
         }
         if (attr.isNotEmpty() && this[attr] is String) {
-            return@replace this[attr] as String //@attribute
+            return@replace this[attr] as String // @attribute
         }
         if (stateMatches == null) { // split state on demand
             val matchesList = state.split(".").toMutableList()
@@ -81,38 +76,36 @@ fun IMonarchLexerMin.substituteMatches(str: String, id: String, matches: List<St
         }
         val sNumber = s.toInt()
         if (s.isNotEmpty() && sNumber < stateMatches!!.size) {
-            return@replace fixCase(stateMatches!![sNumber]) //$Sn
+            return@replace fixCase(stateMatches!![sNumber]) // $Sn
         }
         return@replace ""
     }
 }
 
-/**
- * Find the tokenizer rules for a specific state (i.e. next action)
- */
+/** Find the tokenizer rules for a specific state (i.e. next action) */
 fun IMonarchLexer.findRules(inState: String): List<MonarchRule>? {
     var state: String? = inState
     while (!state.isNullOrEmpty()) {
         val rules = this.tokenizer[state]
 
         if (rules != null) {
-            return rules;
+            return rules
         }
 
-        val idx = state.lastIndexOf('.');
+        val idx = state.lastIndexOf('.')
         state = if (idx < 0) {
-            null; // no further parent
+            null // no further parent
         } else {
-            state.substring(0, idx);
+            state.substring(0, idx)
         }
     }
     return null
 }
 
 /**
- * Is a certain state defined? In contrast to 'findRules' this works on a ILexerMin.
- * This is used during compilation where we may know the defined states
- * but not yet whether the corresponding rules are correct.
+ * Is a certain state defined? In contrast to 'findRules' this works on a ILexerMin. This is used
+ * during compilation where we may know the defined states but not yet whether the corresponding
+ * rules are correct.
  */
 fun IMonarchLexerMin.stateExists(inState: String): Boolean {
     var state: String? = inState
@@ -123,11 +116,11 @@ fun IMonarchLexerMin.stateExists(inState: String): Boolean {
             return true
         }
 
-        val idx = state.lastIndexOf('.');
+        val idx = state.lastIndexOf('.')
         state = if (idx < 0) {
-            null; // no further parent
+            null // no further parent
         } else {
-            state.substring(0, idx);
+            state.substring(0, idx)
         }
     }
     return false
@@ -136,3 +129,25 @@ fun IMonarchLexerMin.stateExists(inState: String): Boolean {
 fun IMonarchLexerMin.createError(msg: String): MonarchException {
     return MonarchException("${languageId}: $msg")
 }
+
+/**
+ * Searches for a bracket in the 'brackets' attribute that matches the input.
+ */
+fun IMonarchLexer.findBracket(matched: String?): MonarchBracket? {
+    if (matched == null) {
+        return null
+    }
+
+    val fixCaseMatched = fixCase(matched)
+
+    val brackets = brackets
+    for (bracket in brackets) {
+        if (bracket.open === fixCaseMatched) {
+            return MonarchBracket(token = bracket.token, bracketType = MonarchBracketType.Open)
+        } else if (bracket.close === fixCaseMatched) {
+            return MonarchBracket(token = bracket.token, bracketType = MonarchBracketType.Close)
+        }
+    }
+    return null
+}
+

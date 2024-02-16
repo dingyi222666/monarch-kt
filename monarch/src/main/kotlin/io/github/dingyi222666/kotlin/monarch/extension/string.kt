@@ -14,7 +14,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
+ *
+ * Contributors:
+ * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
+ * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
+
 
 package io.github.dingyi222666.kotlin.monarch.extension
 
@@ -25,7 +34,7 @@ internal fun createKeywordMatcher(arr: List<String>, caseInsensitive: Boolean = 
     val processedArray = if (caseInsensitive) arr.map { it.lowercase(Locale.getDefault()) } else arr
     val hash = processedArray.associateWith { true }
 
-
+    
     return if (caseInsensitive) {
         { word: String ->
             hash[word.lowercase(Locale.getDefault())] == true && hash.containsKey(word.lowercase(Locale.getDefault()))

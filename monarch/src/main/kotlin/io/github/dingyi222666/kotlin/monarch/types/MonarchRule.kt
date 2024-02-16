@@ -31,6 +31,9 @@ import io.github.dingyi222666.kotlin.monarch.common.compileAction
 import io.github.dingyi222666.kotlin.monarch.common.compileRegExp
 import io.github.dingyi222666.kotlin.monarch.extension.createError
 
+/**
+ * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L70)
+ */
 interface IMonarchRule {
     var regex: Regex
     var action: MonarchFuzzyAction
@@ -50,27 +53,25 @@ class MonarchRule(
         get() = innerName
 
     fun setRegex(lexer: IMonarchLexerMin, regexArg: Any) {
-        var sregex: String
-        if (regexArg is String) {
-            sregex = regexArg
-        } else if (regexArg is Regex) {
-            sregex = regexArg.pattern
-        } else {
-            throw lexer.createError("rules must start with a match string or regular expression: ${this.name}");
+        val currentRegex = when (regexArg) {
+            is String -> regexArg
+            is Regex -> regexArg.pattern
+            else -> throw lexer.createError("rules must start with a match string or regular expression: ${this.name}")
         }
 
-        matchOnlyAtLineStart = (sregex.isNotEmpty() && sregex[0] == '^');
-        innerName = "$name: $sregex"
+        matchOnlyAtLineStart = (currentRegex.isNotEmpty() && currentRegex[0] == '^')
+        innerName = "$name: $currentRegex"
+
         val lexerRegexString = if (matchOnlyAtLineStart) {
-            sregex.substring(1)
+            currentRegex.substring(1)
         } else {
-            sregex
+            currentRegex
         }
 
-        regex = lexer.compileRegExp("^(?:$lexerRegexString)");
+        regex = lexer.compileRegExp("^(?:$lexerRegexString)")
     }
 
     fun setAction(lexer: IMonarchLexerMin, act: Any) {
-        this.action = lexer.compileAction(this.name, act);
+        this.action = lexer.compileAction(this.name, act)
     }
 }

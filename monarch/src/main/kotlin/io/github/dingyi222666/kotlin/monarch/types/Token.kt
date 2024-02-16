@@ -18,31 +18,22 @@
  * Initial code from https://github.com/microsoft/vscode
  * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
  * Initial license: MIT
- *
- * Contributors:
- * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
- * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
-
 
 package io.github.dingyi222666.kotlin.monarch.types
 
 /**
- * Minimal interface for a Monarch lexer.
+ * Tokenization result.
  *
- * Source from [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L23)
+ * Source from [here](https://github.com/microsoft/vscode/blob/e4e853fecf4e83033bade6bad9ea74c6f58dd1ef/src/vs/editor/common/languages.ts#L37)
  */
-interface IMonarchLexerMin {
-    val languageId: String
-    var includeLF: Boolean
-    var noThrow: Boolean
-    var ignoreCase: Boolean
-    var unicode: Boolean
-    var usesEmbedded: Boolean
-    var defaultToken: String
-    var stateNames: Map<String, Any>
+data class Token(
+    val offset: Int,
+    val type: String,
+    val language: String,
+) {
+    override fun toString(): String {
+        return "(" + this.offset + ", " + this.type + ")"
 
-    // Other keys that can be referred to by the tokenizer.
-    @Suppress("UNUSED")
-    operator fun get(attr: String): Any?
+    }
 }

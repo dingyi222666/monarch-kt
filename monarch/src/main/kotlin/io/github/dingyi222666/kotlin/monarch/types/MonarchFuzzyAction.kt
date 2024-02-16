@@ -27,8 +27,12 @@
 
 package io.github.dingyi222666.kotlin.monarch.types
 
+/**
+ * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L52-L93)
+ */
 sealed interface MonarchFuzzyAction {
-    class ActionString(var action: String) : MonarchFuzzyAction
+    @JvmInline
+    value class ActionString(val action: String) : MonarchFuzzyAction
 
     data class ActionBase(
         var group: List<MonarchFuzzyAction>? = null,
@@ -38,9 +42,13 @@ sealed interface MonarchFuzzyAction {
         var next: String? = null,
         var switchTo: String? = null,
         var goBack: Int? = null,
-        var bracket: MonarchBracketStatus? = null,
+        var bracket: MonarchBracketType? = null,
         var nextEmbedded: String? = null,
         var log: String? = null,
         var transform: ((states: List<String>) -> List<String>)? = null
     ) : MonarchFuzzyAction
+
+    @JvmInline
+    value class ActionArray(val actions: List<MonarchFuzzyAction>) : MonarchFuzzyAction
+
 }

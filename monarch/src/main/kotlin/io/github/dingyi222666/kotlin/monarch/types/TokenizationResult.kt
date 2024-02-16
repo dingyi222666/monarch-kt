@@ -14,13 +14,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
  */
-
 
 package io.github.dingyi222666.kotlin.monarch.types
 
-enum class MonarchBracketStatus(val value: Int) {
-    None(0),
-    Open(1),
-    Close(-1)
-}
+/**
+ * The result of a tokenization.
+ * 
+ * Source from [here](https://github.com/microsoft/vscode/blob/d30f7018d2ba0b4fe35816989363e6f5b84f7361/src/vs/editor/common/languages.ts#L55)
+ */
+data class TokenizationResult(
+    val tokens: List<Token>,
+    val endState: TokenizeState
+)

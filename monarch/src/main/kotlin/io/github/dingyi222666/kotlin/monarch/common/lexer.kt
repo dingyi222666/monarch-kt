@@ -14,12 +14,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
+ *
+ * Contributors:
+ * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
+ * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
+
 
 package io.github.dingyi222666.kotlin.monarch.common
 
 import io.github.dingyi222666.kotlin.monarch.extension.*
 import io.github.dingyi222666.kotlin.monarch.types.*
+
+// https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCompile.ts
 
 // Lexer helpers
 
@@ -85,11 +96,11 @@ fun selectScrutinee(id: String, matches: List<String>, state: String, num: Int):
     }
 
     if (num >= 100) {
-        var num = num - 100
+        val currentNum = num - 100
         val parts = state.split(".").toMutableList()
         parts.add(0, state)
-        if (num < parts.size) {
-            return parts[num]
+        if (currentNum < parts.size) {
+            return parts[currentNum]
         }
     }
     return null
@@ -192,8 +203,8 @@ fun IMonarchLexerMin.createGuard(ruleName: String, tkey: String, value: MonarchF
             name = tkey,
             value = value,
             test = { id, matches, state, eos ->
-                val scrutinee = selectScrutinee(id, matches, state, scrut);
-                tester(scrutinee ?: "", id, matches, state, eos);
+                val scrutinee = selectScrutinee(id, matches, state, scrut)
+                tester(scrutinee ?: "", id, matches, state, eos)
             }
         )
     }
@@ -253,7 +264,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
 
         // for each case, push a test function and result value
         for ((caseKey, value) in action.cases) {
-            val compiledValue = compileAction(ruleName, value);
+            val compiledValue = compileAction(ruleName, value)
 
             // what kind of case
             val branch = if (caseKey == "@default" || caseKey == "@" || caseKey.isEmpty()) {
@@ -274,7 +285,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
                 createGuard(
                     ruleName,
                     caseKey, compiledValue
-                );  // call separate function to avoid local variable capture
+                )  // call separate function to avoid local variable capture
             }
 
             cases.add(branch)
@@ -287,7 +298,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
                 for (caseValue in cases) {
                     val didMatch = caseValue.test?.invoke(id, matches, state, eos)
                     if (didMatch == true) {
-                        return@ActionBase caseValue.value;
+                        return@ActionBase caseValue.value
                     }
                 }
                 return@ActionBase defaultAction
@@ -310,11 +321,11 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
         if (bracket != null) {
             when (bracket) {
                 "@open" -> {
-                    newAction.bracket = MonarchBracketStatus.Open;
+                    newAction.bracket = MonarchBracketType.Open
                 }
 
                 "@close" -> {
-                    newAction.bracket = MonarchBracketStatus.Close;
+                    newAction.bracket = MonarchBracketType.Close
                 }
 
                 else -> {
@@ -331,7 +342,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
             var newNext = next
             if (!nextRegex.matches(next)) {
                 if (next[0] == '@') {
-                    newNext = next.substring(1); // peel off starting @ sign
+                    newNext = next.substring(1) // peel off starting @ sign
                 }
                 if (next.indexOf('$') < 0) {  // no dollar substitution, we can check if the state exists
                     if (!stateExists(substituteMatches(next, "", emptyList(), ""))) {
@@ -339,13 +350,13 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
                     }
                 }
             }
-            newAction.next = newNext;
+            newAction.next = newNext
         }
 
 
-        newAction.goBack = action.goBack;
-        newAction.switchTo = action.switchTo;
-        newAction.log = action.log;
+        newAction.goBack = action.goBack
+        newAction.switchTo = action.switchTo
+        newAction.log = action.log
         newAction.nextEmbedded = action.nextEmbedded
 
         usesEmbedded = true
@@ -367,18 +378,18 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
     val lexer = MonarchLexer(languageId) { value -> this[value] }
 
     lexer.includeLF = includeLF ?: false
-    lexer.noThrow = false; // raise exceptions during compilation
-    lexer.maxStack = 100;
+    lexer.noThrow = false // raise exceptions during compilation
+    lexer.maxStack = 100
 
     // Set standard fields: be defensive about types
     lexer.start = start
     lexer.ignoreCase = ignoreCase ?: false
     lexer.unicode = unicode ?: false
 
-    lexer.tokenPostfix = tokenPostfix ?: ".${lexer.languageId}";
-    lexer.defaultToken = defaultToken ?: "source";
+    lexer.tokenPostfix = tokenPostfix ?: ".${lexer.languageId}"
+    lexer.defaultToken = defaultToken ?: "source"
 
-    lexer.usesEmbedded = false; // becomes true if we find a nextEmbedded action
+    lexer.usesEmbedded = false // becomes true if we find a nextEmbedded action
 
     // compile the tokenizer rules
     val tokenizer = this.tokenizer
@@ -387,13 +398,13 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
 
     val lexerMin = MonarchLexer(languageId) { value -> this[value] }
 
-    lexerMin.includeLF = lexer.includeLF;
-    lexerMin.ignoreCase = lexer.ignoreCase;
-    lexerMin.unicode = lexer.unicode;
-    lexerMin.noThrow = lexer.noThrow;
-    lexerMin.usesEmbedded = lexer.usesEmbedded;
+    lexerMin.includeLF = lexer.includeLF
+    lexerMin.ignoreCase = lexer.ignoreCase
+    lexerMin.unicode = lexer.unicode
+    lexerMin.noThrow = lexer.noThrow
+    lexerMin.usesEmbedded = lexer.usesEmbedded
     lexerMin.stateNames = tokenizer
-    lexerMin.defaultToken = lexer.defaultToken;
+    lexerMin.defaultToken = lexer.defaultToken
 
     // Compile an array of rules into newrules where RegExp objects are created.
     fun addRules(state: String, newRules: MutableList<MonarchRule>, rules: List<MonarchLanguageRule>) {
@@ -404,13 +415,13 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
                 var include =
                     rule.include
                 if (include[0] == '@') {
-                    include = include.substring(1); // peel off starting @
+                    include = include.substring(1) // peel off starting @
                 }
 
                 val subInclude =
                     tokenizer[include] ?: throw lexer.createError("include target '$include' is not defined at: $state")
 
-                addRules("$state.$include", newRules, subInclude);
+                addRules("$state.$include", newRules, subInclude)
 
                 continue
             }
@@ -458,16 +469,16 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
 
     for ((key, value) in tokenizer) {
         if (lexer.start == null) {
-            lexer.start = key;
+            lexer.start = key
         }
 
         val prepareAddList = lexerTokenizer.getOrPut(key) {
             mutableListOf()
         }
-        addRules("tokenizer.$key", prepareAddList, value);
+        addRules("tokenizer.$key", prepareAddList, value)
 
     }
-    lexer.usesEmbedded = lexer.usesEmbedded;  // can be set during compileAction
+    lexer.usesEmbedded = lexer.usesEmbedded  // can be set during compileAction
 
     // TODO: DSL Style
     val brackets = brackets ?: listOf(
@@ -498,14 +509,14 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
     }
 
     if (lexer.ignoreCase) {
-        lexer.brackets = newBrackets;
+        lexer.brackets = newBrackets
     } else {
         lexer.brackets = brackets
     }
 
-    lexer.brackets = brackets;
+    lexer.brackets = brackets
 
     // Disable throw so the syntax highlighter goes, no matter what
-    lexer.noThrow = true;
-    return lexer;
+    lexer.noThrow = true
+    return lexer
 }
