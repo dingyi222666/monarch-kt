@@ -33,13 +33,15 @@ import io.github.dingyi222666.monarch.types.*
  * Source from [here](https://github.com/microsoft/vscode/blob/233fd797c0878a551994e55f1e87c23f5a200969/src/vs/editor/standalone/common/monarch/monarchLexer.ts#L390C14-L390C31)
  */
 class MonarchTokenizer(
-    val language: Language,
+    val languageId: String,
+    private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
     private val lexer: IMonarchLexer,
     private val maxTokenizationLineLength: Int = 5000
 ) : ITokenizationSupport {
 
-    private val languageId = language.languageId
-    private val embeddedLanguages = language.embeddedLanguages ?: emptyMap()
+    private val embeddedLanguages by lazy {
+        languageRegistry.getLanguage(languageId)?.embeddedLanguages ?: emptyMap()
+    }
 
     override fun getInitialState(): TokenizeState {
         val rootState = MonarchStackElementFactory.create(null, lexer.start!!)
@@ -265,7 +267,7 @@ class MonarchTokenizer(
                 result = action
             } /*else if (action is MonarchFuzzyAction.ActionBase && action.group != null) {
                 result = MonarchFuzzyAction.ActionArray(action.group!!)
-            } */else if (action is MonarchFuzzyAction.ActionBase && action.token != null) {
+            } */ else if (action is MonarchFuzzyAction.ActionBase && action.token != null) {
                 val token = action.token ?: throw lexer.createError("invalid token action: ${action.token}")
                 // do $n replacements?
                 result = if (action.tokenSubst == true) {
@@ -530,7 +532,7 @@ class MonarchTokenizer(
     }
 
     private fun getNestedEmbeddedLanguageData(languageId: String): EmbeddedLanguageData {
-        if (!LanguageRegistry.isRegisteredLanguage(languageId)) {
+        if (!languageRegistry.isRegisteredLanguage(languageId)) {
             return EmbeddedLanguageData(languageId, NullState)
         }
 
@@ -541,7 +543,7 @@ class MonarchTokenizer(
              this._embeddedLanguages[languageId] = true;
          }*/
 
-        val tokenizationSupport = LanguageRegistry.getTokenizer(languageId)
+        val tokenizationSupport = languageRegistry.getTokenizer(languageId)
         if (tokenizationSupport != null) {
             return EmbeddedLanguageData(languageId, tokenizationSupport.getInitialState())
         }

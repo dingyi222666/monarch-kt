@@ -30,7 +30,9 @@ import io.github.dingyi222666.monarch.types.ITokenizationSupport
  * The language registry.
  *
  */
-object LanguageRegistry {
+class LanguageRegistry(
+    val parent: LanguageRegistry? = null
+) {
 
     private val languageIdToLanguages = mutableMapOf<String, Language>()
     private val tokenizationSupports = mutableMapOf<String, ITokenizationSupport>()
@@ -40,7 +42,7 @@ object LanguageRegistry {
     }
 
     fun getTokenizer(languageId: String): ITokenizationSupport? {
-        return this.tokenizationSupports[languageId]
+        return this.tokenizationSupports[languageId] ?: parent?.getTokenizer(languageId)
     }
 
     fun unregisterTokenizer(languageId: String) {
@@ -56,13 +58,13 @@ object LanguageRegistry {
 
         if (compileToTokenizer) {
             val compiledLexer = language.monarchLanguage.compile(language.languageId)
-            val tokenizer = MonarchTokenizer(language, compiledLexer, maxTokenizationLineLength)
+            val tokenizer = MonarchTokenizer(language.languageId, this, compiledLexer, maxTokenizationLineLength)
             this.registerTokenizer(language.languageId, tokenizer)
         }
     }
 
     fun getLanguage(languageId: String): Language? {
-        return this.languageIdToLanguages[languageId]
+        return this.languageIdToLanguages[languageId] ?: parent?.getLanguage(languageId)
     }
 
     fun isRegisteredLanguage(languageId: String): Boolean {
@@ -71,18 +73,25 @@ object LanguageRegistry {
 
     fun getLanguageByName(languageName: String): Language? {
         return this.languageIdToLanguages.values.firstOrNull { it.languageName == languageName }
+            ?: parent?.getLanguageByName(languageName)
     }
 
     fun getRegisteredLanguages(): List<Language> {
-        return this.languageIdToLanguages.values.toList()
+        return this.languageIdToLanguages.values.toList().plus(
+            parent?.getRegisteredLanguages() ?: emptyList()
+        )
     }
 
     fun getRegisteredTokenizers(): List<ITokenizationSupport> {
-        return this.tokenizationSupports.values.toList()
+        return this.tokenizationSupports.values.toList().plus(
+            parent?.getRegisteredTokenizers() ?: emptyList()
+        )
     }
 
     fun getLanguagesByExt(ext: String): List<Language> {
-        return this.languageIdToLanguages.values.filter { it.fileExtensions?.contains(ext) ?: false }
+        return this.languageIdToLanguages.values.filter { it.fileExtensions?.contains(ext) ?: false }.plus(
+            parent?.getLanguagesByExt(ext) ?: emptyList()
+        )
     }
 
     fun unregisterLanguage(languageId: String) {
@@ -93,5 +102,11 @@ object LanguageRegistry {
     fun clear() {
         this.languageIdToLanguages.clear()
         this.tokenizationSupports.clear()
+    }
+
+    companion object {
+        val instance by lazy {
+            LanguageRegistry()
+        }
     }
 }

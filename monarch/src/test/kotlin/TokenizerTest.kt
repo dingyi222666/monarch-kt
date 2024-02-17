@@ -26,10 +26,9 @@ class TokenizerTest {
 
     @Test
     fun test() {
+        LanguageRegistry.instance.registerLanguage(testLanguage, true)
 
-        LanguageRegistry.registerLanguage(testLanguage, true)
-
-        val tokenizer = LanguageRegistry.getTokenizer("testLanguage") ?: error("no tokenizer")
+        val tokenizer = LanguageRegistry.instance.getTokenizer("testLanguage") ?: error("no tokenizer")
 
         var state = tokenizer.getInitialState()
 
