@@ -15,33 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+package io.github.dingyi222666.monarch.types
 
-plugins {
-    kotlin("jvm")
-}
+/**
+ * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L96)
+ */
+data class MonarchBranch(
+    val name: String,
+    val value: MonarchFuzzyAction,
+    val test: MonarchBranchFunction?
+)
 
-group = "io.github.dingyi222666.kotlin"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
-}
+typealias MonarchBranchFunction = (id: String, matches: List<String>, state: String, eos: Boolean) -> Boolean

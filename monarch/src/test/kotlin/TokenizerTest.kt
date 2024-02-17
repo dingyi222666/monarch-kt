@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-import io.github.dingyi222666.kotlin.monarch.common.*
-import io.github.dingyi222666.kotlin.monarch.language.Language
-import io.github.dingyi222666.kotlin.monarch.language.LanguageRegistry
-import io.github.dingyi222666.kotlin.monarch.types.TokenizationResult
+import io.github.dingyi222666.monarch.common.*
+import io.github.dingyi222666.monarch.language.Language
+import io.github.dingyi222666.monarch.language.LanguageRegistry
 import kotlin.test.Test
 
 
@@ -27,12 +26,8 @@ class TokenizerTest {
 
     @Test
     fun test() {
-        val rootLanguage = Language(
-            languageName = "testLanguage",
-            monarchLanguage = testLanguage
-        )
 
-        LanguageRegistry.registerLanguage(rootLanguage, true)
+        LanguageRegistry.registerLanguage(testLanguage, true)
 
         val tokenizer = LanguageRegistry.getTokenizer("testLanguage") ?: error("no tokenizer")
 
@@ -57,7 +52,7 @@ class TokenizerTest {
             "}\n"
 
 
-    val testLanguage = buildMonarchLanguage {
+    val testLanguage = buildLanguage("testLanguage") {
         defaultToken = "empty"
 
         keywords(
@@ -142,8 +137,8 @@ class TokenizerTest {
 
             comment {
                 "[^\\/*]+" token "comment"
-                "\\/\\*" actionAndNext "comment" state "@push"
-                "\\*/" actionAndNext "comment" state "@pop"
+                "\\/\\*" action "comment" state "@push"
+                "\\*/" action "comment" state "@pop"
                 "[\\/*]" token "comment"
             }
 
@@ -160,7 +155,7 @@ class TokenizerTest {
 
             whitespace {
                 "[ \t\r\n]+" token "whitespace"
-                "\\/\\*" actionAndNext "comment" state "@comment"
+                "\\/\\*" action "comment" state "@comment"
                 "\\/\\/.*\$" token "comment"
             }
         }

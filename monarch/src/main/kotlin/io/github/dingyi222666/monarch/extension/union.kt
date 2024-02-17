@@ -15,33 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+package io.github.dingyi222666.monarch.extension
 
-plugins {
-    kotlin("jvm")
-}
+@JvmInline
+value class UnionType<A, B>(val value: Any)
 
-group = "io.github.dingyi222666.kotlin"
-version = "1.0-SNAPSHOT"
+inline val <reified A> UnionType<A, *>.isLeft: Boolean
+    get() = value is A
 
-repositories {
-    mavenCentral()
-}
+inline val <reified B> UnionType<*, B>.isRight: Boolean
+    get() = value is B
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
+inline val <reified B> UnionType<*, B>.right: B
+    get() = value as B
 
-tasks.test {
-    useJUnitPlatform()
-}
+inline val <reified B> UnionType<*, B>.rightOrNull: B?
+    get() = value as? B
 
-kotlin {
-    jvmToolchain(17)
-}
+inline val <reified A> UnionType<A, *>.left: A
+    get() = value as A
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
-}
+inline val <reified A> UnionType<A, *>.leftOrNull: A?
+    get() = value as? A
+

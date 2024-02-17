@@ -14,34 +14,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+package io.github.dingyi222666.monarch.types
 
-plugins {
-    kotlin("jvm")
-}
+/**
+ * Tokenization result.
+ *
+ * Source from [here](https://github.com/microsoft/vscode/blob/e4e853fecf4e83033bade6bad9ea74c6f58dd1ef/src/vs/editor/common/languages.ts#L37)
+ */
+data class Token(
+    val offset: Int,
+    val type: String,
+    val language: String,
+) {
+    override fun toString(): String {
+        return "(" + this.offset + ", " + this.type + ")"
 
-group = "io.github.dingyi222666.kotlin"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(17)
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+    }
 }
