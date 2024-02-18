@@ -18,10 +18,6 @@
  * Initial code from https://github.com/microsoft/vscode
  * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
  * Initial license: MIT
- *
- * Contributors:
- * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
- * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
 
 
@@ -32,7 +28,7 @@ package io.github.dingyi222666.monarch.types
  */
 sealed interface MonarchFuzzyAction {
     @JvmInline
-    value class ActionString(val action: String) : MonarchFuzzyAction
+    value class ActionString(val token: String) : MonarchFuzzyAction
 
     data class ActionBase(
         var token: String? = null,

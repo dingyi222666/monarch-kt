@@ -34,7 +34,9 @@ import io.github.dingyi222666.monarch.types.TokenizeState
  * Source from
  * [here](https://github.com/microsoft/vscode/blob/d30f7018d2ba0b4fe35816989363e6f5b84f7361/src/vs/editor/standalone/common/monarch/monarchLexer.ts#L238C7-L238C36)
  */
-class MonarchClassicTokensCollector : IMonarchTokensCollector {
+class MonarchClassicTokensCollector(
+    private val languageRegistry: LanguageRegistry = LanguageRegistry.instance
+) : IMonarchTokensCollector {
     private val tokens = mutableListOf<Token>()
     private var languageId: String? = null
     private var lastTokenType: String? = null
@@ -50,7 +52,7 @@ class MonarchClassicTokensCollector : IMonarchTokensCollector {
         }
         lastTokenType = type
         lastTokenLanguage = languageId
-        tokens.add(Token(startOffset, type, this.languageId!!))
+        tokens.add(Token(startOffset, type, this.languageId))
     }
 
     override fun nestedLanguageTokenize(
@@ -63,7 +65,7 @@ class MonarchClassicTokensCollector : IMonarchTokensCollector {
         val nestedLanguageId = embeddedLanguageData.languageId
         val embeddedModeState = embeddedLanguageData.state
 
-        val nestedLanguageTokenizationSupport = LanguageRegistry.getTokenizer(nestedLanguageId)
+        val nestedLanguageTokenizationSupport = languageRegistry.getTokenizer(nestedLanguageId)
         if (nestedLanguageTokenizationSupport == null) {
             enterLanguage(nestedLanguageId)
             emit(offsetDelta, "")

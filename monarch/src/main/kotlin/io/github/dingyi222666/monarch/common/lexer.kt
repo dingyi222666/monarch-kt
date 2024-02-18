@@ -433,7 +433,6 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
                 throw lexer.createError("a rule must be a string or an object, in rule: $state")
             }
 
-            newRule.setRegex(lexerMin, rule.regex)
 
             val action = rule.action
 
@@ -462,6 +461,8 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
             } else {
                 newRule.setAction(lexerMin, action)
             }
+
+            newRule.setRegex(lexerMin, rule.regex)
 
             newRules.add(newRule)
         }
@@ -515,9 +516,6 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
     } else {
         lexer.brackets = brackets
     }
-
-    println(lexer.brackets)
-
 
     // Disable throw so the syntax highlighter goes, no matter what
     lexer.noThrow = true

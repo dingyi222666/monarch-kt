@@ -30,10 +30,9 @@ package io.github.dingyi222666.monarch.types
 data class Token(
     val offset: Int,
     val type: String,
-    val language: String,
+    val language: String?,
 ) {
     override fun toString(): String {
         return "(" + this.offset + ", " + this.type + ")"
-
     }
 }

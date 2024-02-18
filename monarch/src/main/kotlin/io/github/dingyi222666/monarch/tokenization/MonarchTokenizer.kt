@@ -23,7 +23,6 @@
 package io.github.dingyi222666.monarch.tokenization
 
 import io.github.dingyi222666.monarch.extension.*
-import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.types.*
 
@@ -34,8 +33,8 @@ import io.github.dingyi222666.monarch.types.*
  */
 class MonarchTokenizer(
     val languageId: String,
-    private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
     private val lexer: IMonarchLexer,
+    private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
     private val maxTokenizationLineLength: Int = 5000
 ) : ITokenizationSupport {
 
@@ -52,7 +51,7 @@ class MonarchTokenizer(
         if (line.length >= maxTokenizationLineLength) {
             return nullTokenize(languageId, lineState)
         }
-        val tokensCollector = MonarchClassicTokensCollector()
+        val tokensCollector = MonarchClassicTokensCollector(languageRegistry)
         val endLineState = tokenizeImpl(line, hasEOL, lineState as MonarchLineState, tokensCollector)
         return tokensCollector.finalize(endLineState)
     }
@@ -92,8 +91,8 @@ class MonarchTokenizer(
 
             var regex = rule.regex
             val regexSource = rule.regex.pattern
-            if (regexSource.substring(0, 4) == "^(?:" && regexSource.substring(regexSource.length - 1, 1) == ")") {
-                regex = Regex(regexSource.substring(4, regexSource.length - 5), regex.options)
+            if (regexSource.substring(0, 4) == "^(?:" && regexSource.last() == ')') {
+                regex = Regex(regexSource.substring(4, regexSource.length - 1), regex.options)
             }
 
             val result = regex.find(line)?.range?.first ?: -1
@@ -226,6 +225,7 @@ class MonarchTokenizer(
                             matches = currentMatches
                             matched = matches[0]
                             action = rule.action
+                            break
                         }
                     }
                 }
@@ -284,7 +284,7 @@ class MonarchTokenizer(
                             throw lexer.createError("cannot pop embedded language if not inside one")
                         }
                         embeddedLanguageData = null
-                    } else if (embeddedLanguageData == null) {
+                    } else if (embeddedLanguageData != null) {
                         throw lexer.createError("cannot enter embedded language from within an embedded language")
                     } else {
                         enteringEmbeddedLanguage =
@@ -305,7 +305,6 @@ class MonarchTokenizer(
                 val log = action.log
 
                 if (switchTo != null) {
-
                     var nextState =
                         lexer.substituteMatches(switchTo, matched, matches, state)  // switch state without a push...
                     if (nextState[0] == '@') {
@@ -341,7 +340,7 @@ class MonarchTokenizer(
                                 "trying to pop an empty stack in rule: " + safeRuleName(rule)
                             )
                         } else {
-                            stack = stack.pop()!!
+                            stack = requireNotNull(stack.pop())
                         }
                     } else if (action.next == "@popall") {
                         stack = stack.popall()
@@ -433,7 +432,7 @@ class MonarchTokenizer(
                 // regular result
 
                 // check for '@rematch'
-                if (result is MonarchFuzzyAction.ActionString && result.action == "@rematch") {
+                if (result is MonarchFuzzyAction.ActionString && result.token == "@rematch") {
                     pos -= matched.length
                     matched = ""  // better set the next state too...
                     matches = null
@@ -458,7 +457,6 @@ class MonarchTokenizer(
                     ) {
                         continue
                     } else {
-                        println(result)
                         throw lexer.createError(
                             "no progress in tokenizer in rule: " + safeRuleName(rule)
                         )
@@ -468,15 +466,16 @@ class MonarchTokenizer(
                 // return the result (and check for brace matching)
                 // todo: for efficiency we could pre-sanitize tokenPostfix and substitutions
                 val tokenType =
-                    if (result is MonarchFuzzyAction.ActionString && result.action.indexOf("@brackets") == 0) {
-                        val rest = result.action.substring("@brackets".length)
+                    if (
+                        (result is MonarchFuzzyAction.ActionString) && result.token.indexOf("@brackets") == 0) {
+                        val rest = result.token.substring("@brackets".length)
                         val bracket = lexer.findBracket(matched)
                             ?: throw lexer.createError(
                                 "@brackets token returned but no bracket defined as: $matched"
                             )
                         (bracket.token + rest).sanitize()
                     } else {
-                        val rawToken = (result as MonarchFuzzyAction.ActionString).action
+                        val rawToken = (result as MonarchFuzzyAction.ActionString).token
                         val token = if (rawToken.isEmpty()) "" else rawToken + lexer.tokenPostfix
                         token.sanitize()
                     }
@@ -507,7 +506,6 @@ class MonarchTokenizer(
         tokensCollector: IMonarchTokensCollector,
         stack: MonarchStackElement
     ): MonarchLineState {
-
         val languageId = embeddedLanguages[enteringEmbeddedLanguage] ?: enteringEmbeddedLanguage
 
         val embeddedLanguageData = this.getNestedEmbeddedLanguageData(languageId)

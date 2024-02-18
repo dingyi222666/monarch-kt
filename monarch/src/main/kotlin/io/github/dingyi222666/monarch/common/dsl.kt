@@ -33,7 +33,7 @@ annotation class MonarchDSL
 
 @MonarchDSL
 class LanguageScope : MonarchLanguageScope() {
-    
+
     var languageId = "any"
 
     var languageName = "any"
@@ -264,7 +264,7 @@ class MonarchLanguageRuleScope(
     @MonarchDSL
     infix fun String.rules(block: MonarchLanguageRuleArrayScope.() -> Unit): MutableList<MonarchLanguageRule> {
         val rules = buildMonarchLanguageRuleArray(block)
-        this@MonarchLanguageRuleScope.tokenizer[this] = buildMonarchLanguageRuleArray(block)
+        this@MonarchLanguageRuleScope.tokenizer[this] = rules
         return rules
     }
 
@@ -338,12 +338,19 @@ class MonarchLanguageActionArrayScope {
         group.addAll(shortAction.map { MonarchLanguageAction.ShortLanguageAction(it) })
     }
 
-    fun token(shortAction: String) {
-        group.add(MonarchLanguageAction.ShortLanguageAction(shortAction))
+    fun token(token: String) {
+        group.add(MonarchLanguageAction.ShortLanguageAction(token))
     }
 
     inline fun action(block: MonarchLanguageActionScope.() -> Unit) {
         group.add(buildMonarchLanguageAction(block))
+    }
+
+    inline fun action(token: String, block: MonarchLanguageActionScope.() -> Unit) {
+        group.add(buildMonarchLanguageAction {
+            this.token = token
+            block.invoke(this)
+        })
     }
 
     inline fun actionArray(block: MonarchLanguageActionArrayScope.() -> Unit) {
@@ -637,6 +644,11 @@ inline fun MonarchLanguageRuleScope.root(block: MonarchLanguageRuleScope.Monarch
 @MonarchDSL
 inline fun MonarchLanguageRuleScope.comment(block: MonarchLanguageRuleScope.MonarchLanguageRuleArrayScope.() -> Unit): MutableList<MonarchLanguageRule> {
     return "comment" rules buildMonarchLanguageRuleArray(block)
+}
+
+@MonarchDSL
+inline fun MonarchLanguageRuleScope.comments(block: MonarchLanguageRuleScope.MonarchLanguageRuleArrayScope.() -> Unit): MutableList<MonarchLanguageRule> {
+    return "comments" rules buildMonarchLanguageRuleArray(block)
 }
 
 @MonarchDSL

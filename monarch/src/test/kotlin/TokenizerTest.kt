@@ -52,7 +52,7 @@ class TokenizerTest {
 
 
     val testLanguage = buildLanguage("testLanguage") {
-        defaultToken = "empty"
+        // defaultToken = ""
 
         keywords(
             "abstract", "continue", "for", "new", "switch", "assert", "goto", "do",

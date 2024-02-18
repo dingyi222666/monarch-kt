@@ -45,20 +45,24 @@ class LanguageRegistry(
         return this.tokenizationSupports[languageId] ?: parent?.getTokenizer(languageId)
     }
 
+    inline fun <reified T : ITokenizationSupport> getTokenizerCast(languageId: String): T? {
+        return getTokenizer(languageId) as? T
+    }
+
     fun unregisterTokenizer(languageId: String) {
         this.tokenizationSupports.remove(languageId)
     }
 
     fun registerLanguage(
         language: Language,
-        compileToTokenizer: Boolean = false,
+        compileToTokenizer: Boolean = true,
         maxTokenizationLineLength: Int = 5000
     ) {
         this.languageIdToLanguages[language.languageId] = language
 
         if (compileToTokenizer) {
             val compiledLexer = language.monarchLanguage.compile(language.languageId)
-            val tokenizer = MonarchTokenizer(language.languageId, this, compiledLexer, maxTokenizationLineLength)
+            val tokenizer = MonarchTokenizer(language.languageId, compiledLexer, this, maxTokenizationLineLength)
             this.registerTokenizer(language.languageId, tokenizer)
         }
     }

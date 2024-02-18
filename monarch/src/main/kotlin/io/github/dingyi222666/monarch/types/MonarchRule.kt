@@ -46,7 +46,7 @@ class MonarchRule(
 ) : IMonarchRule {
     override var regex: Regex = Regex("")
     override var action: MonarchFuzzyAction = MonarchFuzzyAction.ActionString("")
-    override var matchOnlyAtLineStart: Boolean = false
+    override var matchOnlyAtLineStart = false
     private var innerName: String = name
 
     override val name: String

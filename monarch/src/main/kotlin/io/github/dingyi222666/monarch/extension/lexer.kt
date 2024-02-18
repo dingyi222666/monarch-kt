@@ -25,6 +25,7 @@ package io.github.dingyi222666.monarch.extension
 import io.github.dingyi222666.monarch.types.*
 import java.util.*
 
+
 // https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCompile.ts
 
 /** Puts a string to lower case if 'ignoreCase' is set. */
