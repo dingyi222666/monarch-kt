@@ -18,10 +18,6 @@
  * Initial code from https://github.com/microsoft/vscode
  * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
  * Initial license: MIT
- *
- * Contributors:
- * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
- * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
 
 
@@ -64,4 +60,9 @@ class MonarchLexer(
     override var stateNames: Map<String, Any> = mapOf()
 
     override fun get(attr: String): Any? = attrGet(attr)
+
+    override fun toString(): String {
+        return "MonarchLexer(languageId='$languageId', attrGet=$attrGet, maxStack=$maxStack, start=$start, tokenPostfix='$tokenPostfix', tokenizer=$tokenizer, brackets=$brackets, ignoreCase=$ignoreCase, unicode=$unicode, includeLF=$includeLF, noThrow=$noThrow, usesEmbedded=$usesEmbedded, defaultToken='$defaultToken', stateNames=$stateNames)"
+    }
+
 }

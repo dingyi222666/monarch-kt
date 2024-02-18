@@ -35,7 +35,7 @@ class MonarchTokenizer(
     val languageId: String,
     private val lexer: IMonarchLexer,
     private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
-    private val maxTokenizationLineLength: Int = 5000
+    var maxTokenizationLineLength: Int = 5000
 ) : ITokenizationSupport {
 
     private val embeddedLanguages by lazy {

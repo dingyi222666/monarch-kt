@@ -33,6 +33,8 @@ import kotlin.time.measureTimedValue
  * Initial license: MIT
  */
 
+// current sync version: https://github.com/microsoft/vscode/tree/a8f73340be02966c3816a2f23cb7e446a3a7cb9b/src/vs/editor/standalone/common
+
 // https://github.com/microsoft/vscode/blob/main/src/vs/editor/standalone/test/browser/monarch.test.ts
 class MonarchTest {
 
@@ -147,7 +149,6 @@ class MonarchTest {
     }
 
     // microsoft/monaco-editor#1235: Empty Line Handling
-    @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun testGrammar2() {
         val languageRegistry = LanguageRegistry()
@@ -155,7 +156,7 @@ class MonarchTest {
         val tokenizer = buildLanguage("test") {
             /*tokenizer: {
             root: [
-            { include: '@comments' },
+            { includeand@comments' },
             ],
 
             comments: [
@@ -213,8 +214,6 @@ class MonarchTest {
             "But the line was empty. This line should not be commented."
         )
 
-        println(lines)
-
         val actualTokens = getTokens(tokenizer, lines);
 
         assertEquals(
@@ -233,6 +232,189 @@ class MonarchTest {
                 listOf(Token(0, "source.test", "test"))
             ), actualTokens
         )
+
+        languageRegistry.clear()
+    }
+
+    // microsoft/monaco-editor#2265: Exit a state at end of line
+    @Test
+    fun testGrammar3() {
+        val languageRegistry = LanguageRegistry()
+
+        val tokenizer = buildLanguage("test") {
+            includeLF = true
+
+            tokenizer {
+                root {
+                    """^\*""" action "" state "@inner"
+                    """\:\*""" action "" state "@inner"
+                    "[^*:]+" token "string"
+                    "[*:]" token "string"
+                }
+
+                "inner" rules {
+                    "\n" action "" state "@pop"
+                    """\d+""" token "number"
+                    """[^\d]+""" token ""
+                }
+
+            }
+        }.let {
+            languageRegistry.registerLanguage(it, true)
+            languageRegistry.getTokenizerCast<MonarchTokenizer>(it.languageId)
+                ?: throw IllegalStateException("No tokenizer found")
+        }
+
+        val lines = listOf(
+            "PRINT 10 * 20",
+            "*FX200, 3",
+            "PRINT 2*3:*FX200, 3"
+        )
+
+        val actualTokens = getTokens(tokenizer, lines);
+
+        assertEquals(
+            listOf(
+                listOf(Token(0, "string.test", "test")),
+                listOf(
+                    Token(0, "", "test"),
+                    Token(3, "number.test", "test"),
+                    Token(6, "", "test"),
+                    Token(8, "number.test", "test"),
+                ),
+                listOf(
+                    Token(0, "string.test", "test"),
+                    Token(9, "", "test"),
+                    Token(13, "number.test", "test"),
+                    Token(16, "", "test"),
+                    Token(18, "number.test", "test")
+                )
+            ),
+            actualTokens
+        )
+
+        languageRegistry.clear()
+    }
+
+    // microsoft/vscode #115662: monarchCompile function need an extra option which can control replacement
+    @Test
+    fun testGrammar4() {
+
+        val tokenizer1 = buildMonarchLanguage {
+            ignoreCase = false
+            "uselessReplaceKey1" and "@uselessReplaceKey2"
+            "uselessReplaceKey2" and "@uselessReplaceKey3"
+            "uselessReplaceKey3" and "@uselessReplaceKey4"
+            "uselessReplaceKey4" and "@uselessReplaceKey5"
+            "uselessReplaceKey5" and "@ham"
+
+            tokenizer {
+                root {
+                    // /@\w+/
+                    (if (Regex("@\\w+").matches("@ham")) {
+                        // ^${'@uselessReplaceKey1'}$ -> ^@uselessReplaceKey1$
+                        "^@uselessReplaceKey1$"
+                    } else {
+                        // ^${'@ham'}$ -> ^@ham$
+                        "^@ham$"
+                    }) action {
+                        token = "ham"
+                    }
+                }
+            }
+        }.let {
+            val lexer = it.compile("test")
+            MonarchTokenizer("test", lexer, LanguageRegistry.instance, 5000)
+        }
+
+        val tokenizer2 = buildMonarchLanguage {
+            ignoreCase = false
+            tokenizer {
+                root {
+                    "@@ham" token "ham"
+                }
+            }
+        }.let {
+            val lexer = it.compile("test")
+            MonarchTokenizer("test", lexer, LanguageRegistry.instance, 5000)
+        }
+
+        val lines = listOf(
+            "@ham"
+        )
+
+        val actualTokens1 = getTokens(tokenizer1, lines)
+
+        assertEquals(
+            listOf(
+                listOf(Token(0, "ham.test", "test"))
+            ),
+            actualTokens1
+        )
+
+        val actualTokens2 = getTokens(tokenizer2, lines)
+
+        assertEquals(
+            listOf(
+                listOf(Token(0, "ham.test", "test"))
+            ),
+            actualTokens2
+        )
+    }
+
+    // microsoft/monaco-editor#2424: Allow to target @@
+    @Test
+    fun testGrammar5() {
+        val languageRegistry = LanguageRegistry()
+
+        val tokenizer = buildLanguage("test") {
+           /* ignoreCase: false,
+            tokenizer: {
+            root: [
+            {
+                regex: /@@@@/,
+                action: { token: 'ham' }
+            },
+            ],
+        },*/
+            ignoreCase = false
+            tokenizer {
+                root {
+                    "@@" action { token = "ham" }
+                }
+            }
+        }.let {
+            languageRegistry.registerLanguage(it, true)
+            languageRegistry.getTokenizerCast<MonarchTokenizer>(it.languageId)
+                ?: throw IllegalStateException("No tokenizer found")
+        }
+
+       /* const lines = [
+            `@@`
+        ];
+
+        const actualTokens = getTokens(tokenizer, lines);
+        assert.deepStrictEqual(actualTokens, [
+            [
+                new Token(0, 'ham.test', 'test'),
+        ]
+        ]);
+
+        disposables.dispose();*/
+
+        val lines = listOf(
+            "@@"
+        )
+
+        val actualTokens = getTokens(tokenizer, lines)
+
+        assertEquals(
+            listOf(
+                listOf(Token(0, "ham.test", "test"))
+            ),
+            actualTokens
+        )
+
     }
 }
 

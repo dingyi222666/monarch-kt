@@ -178,6 +178,7 @@ class MonarchLanguageRuleScope(
             return ruleList
         }
 
+
         @MonarchDSL
         infix fun String.action(action: MonarchLanguageAction): MonarchLanguageRule {
             val result = MonarchLanguageRule.ShortRule1(UnionType(this), action)

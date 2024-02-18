@@ -30,7 +30,7 @@ import io.github.dingyi222666.monarch.types.*
 
 // Lexer helpers
 
-internal val regex1 = " @@".toRegex()
+internal val regex1 = "@@".toRegex()
 internal val wordsRegex = "@(\\w+)".toRegex()
 
 /**
@@ -44,7 +44,7 @@ fun IMonarchLexerMin.compileRegExp(str: String): Regex {
     // @@ must be interpreted as a literal @, so we replace all occurrences of @@ with a placeholder character
     var str = str.replace(regex1, "\u0001")
 
-    var hadExpansion = false
+    var hadExpansion: Boolean
     var n = 0
     do {
         hadExpansion = false
@@ -470,7 +470,6 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
 
     val lexerTokenizer = mutableMapOf<String, MutableList<MonarchRule>>()
     lexer.tokenizer = lexerTokenizer
-
     for ((key, value) in tokenizer) {
         if (lexer.start == null) {
             lexer.start = key
