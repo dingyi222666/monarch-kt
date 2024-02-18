@@ -23,36 +23,41 @@
 package io.github.dingyi222666.monarch.tokenization
 
 import io.github.dingyi222666.monarch.language.LanguageRegistry
-import io.github.dingyi222666.monarch.types.IMonarchTokensCollector
-import io.github.dingyi222666.monarch.types.Token
-import io.github.dingyi222666.monarch.types.TokenizationResult
-import io.github.dingyi222666.monarch.types.TokenizeState
+import io.github.dingyi222666.monarch.types.*
+import java.util.Collections.addAll
 
 /**
- * Classic tokens collector for monarch.
+ * Modern tokens collector for monarch.
  *
  * Source from
- * [here](https://github.com/microsoft/vscode/blob/d30f7018d2ba0b4fe35816989363e6f5b84f7361/src/vs/editor/standalone/common/monarch/monarchLexer.ts#L238C7-L238C36)
+ * [here](https://github.com/microsoft/vscode/blob/d30f7018d2ba0b4fe35816989363e6f5b84f7361/src/vs/editor/standalone/common/monarch/monarchLexer.ts#L295)
  */
-class MonarchClassicTokensCollector(
-    private val languageRegistry: LanguageRegistry = LanguageRegistry.instance
+class MonarchModernTokensCollector(
+    private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
+    private val tokenTheme: ITokenTheme,
 ) : IMonarchTokensCollector {
-    private val tokens = mutableListOf<Token>()
+
     private var languageId: String? = null
     private var lastTokenType: String? = null
     private var lastTokenLanguage: String? = null
+
+    private var prependTokens = emptyList<Int>()
+    private var tokens = mutableListOf<Int>()
+
+    private var lastTokenMetadata: Int = 0
 
     override fun enterLanguage(languageId: String) {
         this.languageId = languageId
     }
 
     override fun emit(startOffset: Int, type: String) {
-        if (lastTokenType == type && lastTokenLanguage == languageId) {
-            return
+        val metadata = tokenTheme.match(LanguageId.Null, type) or MetadataConsts.BALANCED_BRACKETS_MASK
+        if (lastTokenMetadata == metadata) {
+            return;
         }
-        lastTokenType = type
-        lastTokenLanguage = languageId
-        tokens.add(Token(startOffset, type, this.languageId))
+        lastTokenMetadata = metadata
+        tokens.add(startOffset)
+        tokens.add(metadata)
     }
 
     override fun nestedLanguageTokenize(
@@ -61,6 +66,7 @@ class MonarchClassicTokensCollector(
         embeddedLanguageData: EmbeddedLanguageData,
         offsetDelta: Int
     ): TokenizeState {
+
         val nestedLanguageId = embeddedLanguageData.languageId
         val embeddedModeState = embeddedLanguageData.state
 
@@ -71,23 +77,26 @@ class MonarchClassicTokensCollector(
             return embeddedModeState
         }
 
-        val nestedResult = nestedLanguageTokenizationSupport.tokenize(embeddedLanguageLine, hasEOL, embeddedModeState)
+        val nestedResult =
+            nestedLanguageTokenizationSupport.tokenizeEncoded(embeddedLanguageLine, hasEOL, embeddedModeState)
         if (offsetDelta != 0) {
-            for (token in nestedResult.tokens) {
-                tokens.add(Token(token.offset + offsetDelta, token.type, token.language))
+            /*for (let i = 0, len = nestedResult.tokens.length; i < len; i += 2) {
+                nestedResult.tokens[i] += offsetDelta;
+            }*/
+            for (i in 0 until nestedResult.tokens.size step 2) {
+                nestedResult.tokens[i] += offsetDelta
             }
-        } else {
-            // this._tokens = this._tokens.concat(nestedResult.tokens);
-            this.tokens.addAll(nestedResult.tokens)
+
         }
 
-        lastTokenType = null
-        lastTokenLanguage = null
-        languageId = null
+        this.prependTokens = prependTokens + tokens + nestedResult.tokens
+        tokens.clear()
+        this.lastTokenMetadata = 0;
+        this.languageId = null
         return nestedResult.endState
     }
 
-    fun finalize(endState: MonarchLineState): TokenizationResult {
-        return TokenizationResult(tokens, endState)
+    fun finalize(endState: MonarchLineState): EncodedTokenizationResult {
+        return EncodedTokenizationResult((prependTokens + tokens).toMutableList(), endState)
     }
 }

@@ -199,7 +199,7 @@ class MonarchTest {
         }
 
 
-        val lines = listOf(
+        val lines = arrayOf(
             """// This comment \\""",
             "   continues on the following line",
             "",

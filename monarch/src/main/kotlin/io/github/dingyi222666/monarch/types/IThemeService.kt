@@ -22,16 +22,10 @@
 
 package io.github.dingyi222666.monarch.types
 
-/**
- * The tokenization support.
- *
- * Source from [here](https://github.com/microsoft/vscode/blob/233fd797c0878a551994e55f1e87c23f5a200969/src/vs/editor/common/languages.ts#L87)
- */
-interface ITokenizationSupport {
+fun interface IThemeService {
+    fun currentColorTheme(): ITokenTheme
+}
 
-    fun getInitialState(): TokenizeState
-
-    fun tokenize(line: String, hasEOL: Boolean, lineState: TokenizeState): TokenizationResult
-
-    fun tokenizeEncoded(line: String, hasEOL: Boolean, lineState: TokenizeState): EncodedTokenizationResult;
+fun interface ITokenTheme {
+    fun match(languageId: Int, token: String): Int
 }

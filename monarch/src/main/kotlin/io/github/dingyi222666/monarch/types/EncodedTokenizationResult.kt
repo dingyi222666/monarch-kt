@@ -18,20 +18,20 @@
  * Initial code from https://github.com/microsoft/vscode
  * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
  * Initial license: MIT
+ *
+ * Contributors:
+ * - Microsoft Corporation: Initial code, written in TypeScript, licensed under MIT license
+ * - dingyi222666 <dingyi222666@foxmail.com> - translation and adaptation to Kotlin
  */
 
 package io.github.dingyi222666.monarch.types
 
 /**
- * The tokenization support.
- *
- * Source from [here](https://github.com/microsoft/vscode/blob/233fd797c0878a551994e55f1e87c23f5a200969/src/vs/editor/common/languages.ts#L87)
+ * The result of a tokenization.
+ * 
+ * Source from [here](https://github.com/microsoft/vscode/blob/11095a2781bd2a14cbaddc1b925f196f1e9452bc/src/vs/editor/common/languages.ts#L68C14-L68C40)
  */
-interface ITokenizationSupport {
-
-    fun getInitialState(): TokenizeState
-
-    fun tokenize(line: String, hasEOL: Boolean, lineState: TokenizeState): TokenizationResult
-
-    fun tokenizeEncoded(line: String, hasEOL: Boolean, lineState: TokenizeState): EncodedTokenizationResult;
-}
+data class EncodedTokenizationResult(
+    val tokens: MutableList<Int>,
+    val endState: TokenizeState
+)

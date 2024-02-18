@@ -35,6 +35,7 @@ class MonarchTokenizer(
     val languageId: String,
     private val lexer: IMonarchLexer,
     private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
+    private val themeService: IThemeService? = null,
     var maxTokenizationLineLength: Int = 5000
 ) : ITokenizationSupport {
 
@@ -54,6 +55,16 @@ class MonarchTokenizer(
         val tokensCollector = MonarchClassicTokensCollector(languageRegistry)
         val endLineState = tokenizeImpl(line, hasEOL, lineState as MonarchLineState, tokensCollector)
         return tokensCollector.finalize(endLineState)
+    }
+
+    override fun tokenizeEncoded(line: String, hasEOL: Boolean, lineState: TokenizeState): EncodedTokenizationResult {
+        if (line.length >= maxTokenizationLineLength) {
+            return nullTokenizeEncoded(LanguageId.Null, lineState)
+        }
+        val tokenTheme = themeService?.currentColorTheme() ?: throw IllegalStateException("No theme service")
+        val tokensCollector = MonarchModernTokensCollector(languageRegistry, tokenTheme);
+        val endLineState = tokenizeImpl(line, hasEOL, lineState as MonarchLineState, tokensCollector)
+        return tokensCollector.finalize(endLineState);
     }
 
     private fun tokenizeImpl(
@@ -569,3 +580,16 @@ fun nullTokenize(languageId: String, state: TokenizeState): TokenizationResult {
     return TokenizationResult(listOf(Token(0, "", languageId)), state)
 }
 
+fun nullTokenizeEncoded(languageId: Int, state: TokenizeState?): EncodedTokenizationResult {
+    val tokens = mutableListOf(0, 0)
+    tokens[0] = 0
+    tokens[1] = (
+            (languageId shl MetadataConsts.LANGUAGEID_OFFSET).toUInt()
+                    or ((StandardTokenType.Other shl MetadataConsts.TOKEN_TYPE_OFFSET).toUInt())
+                    or ((FontStyle.None shl MetadataConsts.FONT_STYLE_OFFSET).toUInt())
+                    or ((ColorId.DefaultForeground shl MetadataConsts.FOREGROUND_OFFSET).toUInt())
+                    or ((ColorId.DefaultBackground shl MetadataConsts.BACKGROUND_OFFSET).toUInt())
+            ).toInt()
+
+    return EncodedTokenizationResult(tokens, if (state === null) NullState else state)
+}
