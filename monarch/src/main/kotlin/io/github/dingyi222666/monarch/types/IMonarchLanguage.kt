@@ -27,10 +27,14 @@
 
 package io.github.dingyi222666.monarch.types
 
+import com.squareup.moshi.JsonClass
+
+
 // A Monarch language definition
+@JsonClass(generateAdapter = false)
 interface IMonarchLanguage {
     // map from string to ILanguageRule[]
-    val tokenizer: MutableMap<String, MutableList<MonarchLanguageRule>>?
+    val tokenizer: Map<String, List<MonarchLanguageRule>>?
 
     // is the language case-insensitive?
     var ignoreCase: Boolean?
@@ -42,7 +46,7 @@ interface IMonarchLanguage {
     val defaultToken: String?
 
     // for example [['{','}','delimiter.curly']]
-    val brackets: MutableList<MonarchLanguageBracket>?
+    val brackets: List<MonarchLanguageBracket>?
 
     // start symbol in the tokenizer (by default the first entry is used)
     val start: String?

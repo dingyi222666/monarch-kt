@@ -80,13 +80,9 @@ class MonarchModernTokensCollector(
         val nestedResult =
             nestedLanguageTokenizationSupport.tokenizeEncoded(embeddedLanguageLine, hasEOL, embeddedModeState)
         if (offsetDelta != 0) {
-            /*for (let i = 0, len = nestedResult.tokens.length; i < len; i += 2) {
-                nestedResult.tokens[i] += offsetDelta;
-            }*/
             for (i in 0 until nestedResult.tokens.size step 2) {
                 nestedResult.tokens[i] += offsetDelta
             }
-
         }
 
         this.prependTokens = prependTokens + tokens + nestedResult.tokens

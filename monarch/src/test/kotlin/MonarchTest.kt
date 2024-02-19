@@ -199,7 +199,7 @@ class MonarchTest {
         }
 
 
-        val lines = arrayOf(
+        val lines = listOf(
             """// This comment \\""",
             "   continues on the following line",
             "",
@@ -324,7 +324,7 @@ class MonarchTest {
             }
         }.let {
             val lexer = it.compile("test")
-            MonarchTokenizer("test", lexer, LanguageRegistry.instance, 5000)
+            MonarchTokenizer("test", lexer, LanguageRegistry.instance, null, 5000)
         }
 
         val tokenizer2 = buildMonarchLanguage {
@@ -336,7 +336,7 @@ class MonarchTest {
             }
         }.let {
             val lexer = it.compile("test")
-            MonarchTokenizer("test", lexer, LanguageRegistry.instance, 5000)
+            MonarchTokenizer("test", lexer, LanguageRegistry.instance, null, 5000)
         }
 
         val lines = listOf(
@@ -368,15 +368,15 @@ class MonarchTest {
         val languageRegistry = LanguageRegistry()
 
         val tokenizer = buildLanguage("test") {
-           /* ignoreCase: false,
-            tokenizer: {
-            root: [
-            {
-                regex: /@@@@/,
-                action: { token: 'ham' }
-            },
-            ],
-        },*/
+            /* ignoreCase: false,
+             tokenizer: {
+             root: [
+             {
+                 regex: /@@@@/,
+                 action: { token: 'ham' }
+             },
+             ],
+         },*/
             ignoreCase = false
             tokenizer {
                 root {
@@ -389,18 +389,18 @@ class MonarchTest {
                 ?: throw IllegalStateException("No tokenizer found")
         }
 
-       /* const lines = [
-            `@@`
-        ];
+        /* const lines = [
+             `@@`
+         ];
 
-        const actualTokens = getTokens(tokenizer, lines);
-        assert.deepStrictEqual(actualTokens, [
-            [
-                new Token(0, 'ham.test', 'test'),
-        ]
-        ]);
+         const actualTokens = getTokens(tokenizer, lines);
+         assert.deepStrictEqual(actualTokens, [
+             [
+                 new Token(0, 'ham.test', 'test'),
+         ]
+         ]);
 
-        disposables.dispose();*/
+         disposables.dispose();*/
 
         val lines = listOf(
             "@@"

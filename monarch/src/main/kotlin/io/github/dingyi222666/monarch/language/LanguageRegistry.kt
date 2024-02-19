@@ -24,6 +24,7 @@ package io.github.dingyi222666.monarch.language
 
 import io.github.dingyi222666.monarch.common.compile
 import io.github.dingyi222666.monarch.tokenization.MonarchTokenizer
+import io.github.dingyi222666.monarch.types.IThemeService
 import io.github.dingyi222666.monarch.types.ITokenizationSupport
 
 /**
@@ -56,13 +57,15 @@ class LanguageRegistry(
     fun registerLanguage(
         language: Language,
         compileToTokenizer: Boolean = true,
+        themeService: IThemeService? = null,
         maxTokenizationLineLength: Int = 5000
     ) {
         this.languageIdToLanguages[language.languageId] = language
 
         if (compileToTokenizer) {
             val compiledLexer = language.monarchLanguage.compile(language.languageId)
-            val tokenizer = MonarchTokenizer(language.languageId, compiledLexer, this, maxTokenizationLineLength)
+            val tokenizer =
+                MonarchTokenizer(language.languageId, compiledLexer, this, themeService, maxTokenizationLineLength)
             this.registerTokenizer(language.languageId, tokenizer)
         }
     }

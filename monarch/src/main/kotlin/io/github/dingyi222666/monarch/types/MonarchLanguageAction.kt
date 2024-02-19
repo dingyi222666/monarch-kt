@@ -66,6 +66,47 @@ sealed interface MonarchLanguageAction {
 
     @JvmInline
     value class ActionArray(val actions: List<MonarchLanguageAction>) : MonarchLanguageAction
+
+    data class MutableExpandedLanguageAction(
+        // array of actions for each parenthesized match group
+        var group: List<MonarchLanguageAction>? = null,
+
+        // map from string to ILanguageAction
+        var cases: Map<String, MonarchLanguageAction>? = null,
+
+        // token class (ie. css class) (or "@brackets" or "@rematch")
+        var token: String? = null,
+
+        // the next state to push, or "@push", "@pop", "@popall"
+        var next: String? = null,
+
+        // switch to this state
+        var switchTo: String? = null,
+
+        // go back n characters in the stream
+        var goBack: Int? = null,
+
+        // @open or @close
+        var bracket: String? = null,
+
+        // switch to embedded language (using the mimetype) or get out using "@pop"
+        var nextEmbedded: String? = null,
+
+        // log a message to the browser console window
+        var log: String? = null
+    ) {
+        fun toExpandedLanguageAction(): ExpandedLanguageAction = ExpandedLanguageAction(
+            group,
+            cases,
+            token,
+            next,
+            switchTo,
+            goBack,
+            bracket,
+            nextEmbedded,
+            log
+        )
+    }
 }
 
 

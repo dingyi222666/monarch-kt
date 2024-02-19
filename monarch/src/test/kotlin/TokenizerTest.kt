@@ -17,8 +17,8 @@
  */
 
 import io.github.dingyi222666.monarch.common.*
-import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
+import io.github.dingyi222666.monarch.loader.loadMonarchJson
 import kotlin.test.Test
 
 
@@ -39,7 +39,13 @@ class TokenizerTest {
             state = result.endState
             println(result.tokens)
         }
+    }
 
+    @OptIn(ExperimentalStdlibApi::class)
+    @Test
+    fun parseJsonGrammar() {
+        val text = this::class.java.getResource("lua.json").readText()
+        println(loadMonarchJson(text))
     }
 
     val code = "// Type source code in your language here...\n" +
@@ -159,4 +165,6 @@ class TokenizerTest {
             }
         }
     }
+
+
 }

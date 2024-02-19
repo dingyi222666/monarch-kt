@@ -24,11 +24,11 @@ package io.github.dingyi222666.monarch.types
 
 
 internal class MonarchLanguage : IMonarchLanguage {
-    override var tokenizer: MutableMap<String, MutableList<MonarchLanguageRule>>? = null
+    override var tokenizer: Map<String, List<MonarchLanguageRule>>? = null
     override var ignoreCase: Boolean? = null
     override var unicode: Boolean? = null
     override var defaultToken: String? = null
-    override var brackets: MutableList<MonarchLanguageBracket>? = null
+    override var brackets: List<MonarchLanguageBracket>? = null
     override var start: String? = null
     override var tokenPostfix: String? = null
     override var includeLF: Boolean? = null
@@ -42,6 +42,4 @@ internal class MonarchLanguage : IMonarchLanguage {
     override fun toString(): String {
         return "MonarchLanguage(tokenizer=$tokenizer, ignoreCase=$ignoreCase, unicode=$unicode, defaultToken=$defaultToken, brackets=$brackets, start=$start, tokenPostfix=$tokenPostfix, includeLF=$includeLF, attrMap=$attrMap)"
     }
-
-
 }
