@@ -58,7 +58,11 @@ interface IMonarchLanguage {
     // Defaults to false
     var includeLF: Boolean?
 
+    val attrMap: Map<String,Any>
+
     // Other keys that can be referred to by the tokenizer.
     @Suppress("UNUSED")
-    operator fun get(key: String): Any?
+    operator fun get(key: String): Any? {
+        return attrMap[key]
+    }
 }

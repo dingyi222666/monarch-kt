@@ -38,8 +38,6 @@ class MonarchModernTokensCollector(
 ) : IMonarchTokensCollector {
 
     private var languageId: String? = null
-    private var lastTokenType: String? = null
-    private var lastTokenLanguage: String? = null
 
     private var prependTokens = emptyList<Int>()
     private var tokens = mutableListOf<Int>()
@@ -53,7 +51,7 @@ class MonarchModernTokensCollector(
     override fun emit(startOffset: Int, type: String) {
         val metadata = tokenTheme.match(LanguageId.Null, type) or MetadataConsts.BALANCED_BRACKETS_MASK
         if (lastTokenMetadata == metadata) {
-            return;
+            return
         }
         lastTokenMetadata = metadata
         tokens.add(startOffset)

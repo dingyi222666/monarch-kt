@@ -83,5 +83,74 @@ class MonarchLanguageAdapter : JsonAdapter<IMonarchLanguage>() {
             writer.nullValue()
             return
         }
+
+        writer.indent = "  "
+        writer.isLenient = true
+
+        writer.beginObject()
+
+        if (value.defaultToken != null) {
+            writer.name("defaultToken")
+            writer.value(value.defaultToken)
+        }
+
+        if (value.brackets != null && value.brackets?.isNotEmpty() == true) {
+            writer.name("brackets")
+            bracketAdapter.toJson(writer, value.brackets)
+        }
+
+
+        if (value.start != null) {
+            writer.name("start")
+            writer.value(value.start)
+        }
+
+        if (value.includeLF != null) {
+            writer.name("includeLF")
+            writer.value(value.includeLF)
+        }
+
+        if (value.unicode != null) {
+            writer.name("unicode")
+            writer.value(value.unicode)
+        }
+
+        if (value.ignoreCase != null) {
+            writer.name("ignoreCase")
+            writer.value(value.ignoreCase)
+        }
+
+        for ((key, value) in value.attrMap) {
+            writer.name(key)
+            when (value) {
+                is List<*> -> {
+                    stringArrayAdapter.toJson(
+                        writer,
+                        value as List<String>
+                    )
+                }
+
+                is String -> {
+                    writer.value(value)
+                }
+
+                is Regex -> {
+                    writer.value(value.pattern)
+                }
+
+                else -> {
+                    throw JsonDataException("Unexpected value $value in path ${writer.path}")
+                }
+            }
+        }
+
+
+        if (value.tokenizer != null) {
+            writer.name("tokenizer")
+            ruleAdapter.toJson(writer, value.tokenizer)
+        }
+
+
+        writer.endObject()
     }
 }

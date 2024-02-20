@@ -42,3 +42,7 @@ inline fun <reified T> Moshi.Builder.add(adapter: JsonAdapter<T>): Moshi.Builder
 fun loadMonarchJson(json: String): IMonarchLanguage? {
     return MoshiRoot.adapter(IMonarchLanguage::class.java).fromJson(json)
 }
+
+fun IMonarchLanguage.toMonarchJson(): String {
+    return MoshiRoot.adapter(IMonarchLanguage::class.java).toJson(this)
+}

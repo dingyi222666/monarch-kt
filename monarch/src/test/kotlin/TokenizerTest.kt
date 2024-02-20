@@ -19,6 +19,7 @@
 import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.loadMonarchJson
+import io.github.dingyi222666.monarch.loader.toMonarchJson
 import kotlin.test.Test
 
 
@@ -39,6 +40,8 @@ class TokenizerTest {
             state = result.endState
             println(result.tokens)
         }
+
+        println(testLanguage.monarchLanguage.toMonarchJson())
     }
 
     @OptIn(ExperimentalStdlibApi::class)

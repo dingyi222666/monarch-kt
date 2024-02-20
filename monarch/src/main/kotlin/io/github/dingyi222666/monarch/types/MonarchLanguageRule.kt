@@ -27,21 +27,20 @@
 
 package io.github.dingyi222666.monarch.types
 
-import io.github.dingyi222666.monarch.extension.UnionType
 
 /**
  * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchTypes.ts#L55-L82)
  */
 sealed interface MonarchLanguageRule {
     data class ShortRule1(
-        override val regex: UnionType<String, Regex>,
+        override val regex: Any,
         override val action: MonarchLanguageAction
     ) : MonarchLanguageRule, ShortRule
 
     data class ShortRule2(
-        override val regex: UnionType<String, Regex>,
+        override val regex: Any,
         override val action: MonarchLanguageAction,
-        val nextState: String
+        var nextState: String
     ) : MonarchLanguageRule, ShortRule
 
     @JvmInline
@@ -50,7 +49,7 @@ sealed interface MonarchLanguageRule {
     ) : MonarchLanguageRule
 
     interface ShortRule {
-        val regex: UnionType<String, Regex>
+        val regex: Any
         val action: MonarchLanguageAction
     }
 }

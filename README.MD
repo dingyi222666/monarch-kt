@@ -13,7 +13,7 @@ Advanced) since many of the advanced features are rarely used in most language d
 ## Features
 
 - A simple syntax definition based on regular expressions, powered by the monarch highlighting library
-- Define highlighting syntax with elegant Kotlin DSL (json file definition will be supported soon, still in development)
+- Define highlighting syntax with elegant Kotlin DSL or JSON format
 - Minimal implementation, only provides basic analysis, easy to integrate into your project
 
 ## Usage

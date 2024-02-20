@@ -33,11 +33,7 @@ internal class MonarchLanguage : IMonarchLanguage {
     override var tokenPostfix: String? = null
     override var includeLF: Boolean? = null
 
-    var attrMap = mutableMapOf<String, Any>()
-
-    override fun get(key: String): Any? {
-        return attrMap[key]
-    }
+    override var attrMap = mutableMapOf<String, Any>()
 
     override fun toString(): String {
         return "MonarchLanguage(tokenizer=$tokenizer, ignoreCase=$ignoreCase, unicode=$unicode, defaultToken=$defaultToken, brackets=$brackets, start=$start, tokenPostfix=$tokenPostfix, includeLF=$includeLF, attrMap=$attrMap)"

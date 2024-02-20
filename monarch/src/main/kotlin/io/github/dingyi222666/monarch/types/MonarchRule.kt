@@ -52,10 +52,10 @@ class MonarchRule(
     override val name: String
         get() = innerName
 
-    fun setRegex(lexer: IMonarchLexerMin, regexArg: UnionType<String, Regex>) {
-        val currentRegex = when {
-            regexArg.isLeft -> regexArg.left
-            regexArg.isRight -> regexArg.right.pattern
+    fun setRegex(lexer: IMonarchLexerMin, regexArg: Any) {
+        val currentRegex = when(regexArg) {
+            is String -> regexArg
+            is Regex -> regexArg.pattern
             else -> throw lexer.createError("rules must start with a match string or regular expression: ${this.name}")
         }
 

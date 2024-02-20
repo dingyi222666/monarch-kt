@@ -54,13 +54,6 @@ fun IMonarchLexerMin.compileRegExp(str: String): Regex {
             val sub = when (val value = this[attr]) {
                 is String -> value
                 is Regex -> value.pattern
-                is UnionType<*, *> -> {
-                    val unionValue = value as UnionType<String, Regex>
-                    if (unionValue.isLeft) {
-                        unionValue.left
-                    } else unionValue.right.pattern
-                }
-
                 else -> {
                     if (value == null) {
                         throw MonarchException(
@@ -247,7 +240,7 @@ fun IMonarchLexerMin.compileAction(ruleName: String, action: Any?): MonarchFuzzy
     }
 
     return when (action) {
-        is MonarchLanguageAction.ShortLanguageAction -> MonarchFuzzyAction.ActionString(action.action)
+        is MonarchLanguageAction.ShortLanguageAction -> MonarchFuzzyAction.ActionString(action.token)
         is MonarchLanguageAction.ActionArray -> compileAction(ruleName, action.actions)
         is MonarchLanguageAction.ExpandedLanguageAction -> compileExpandedLanguageAction(ruleName, action)
     }
@@ -444,7 +437,7 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
             ) {
                 newRule.setAction(
                     lexerMin, MonarchLanguageAction.ExpandedLanguageAction(
-                        token = action.action,
+                        token = action.token,
                         next = rule.nextState
                     )
                 )

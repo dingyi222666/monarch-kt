@@ -32,7 +32,7 @@ package io.github.dingyi222666.monarch.types
  */
 sealed interface MonarchLanguageAction {
     @JvmInline
-    value class ShortLanguageAction(val action: String) : MonarchLanguageAction
+    value class ShortLanguageAction(val token: String) : MonarchLanguageAction
 
     data class ExpandedLanguageAction(
         // array of actions for each parenthesized match group

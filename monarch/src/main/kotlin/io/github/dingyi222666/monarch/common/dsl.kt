@@ -22,7 +22,7 @@
 
 package io.github.dingyi222666.monarch.common
 
-import io.github.dingyi222666.monarch.extension.UnionType
+
 import io.github.dingyi222666.monarch.extension.splitSpaceToList
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.types.*
@@ -181,7 +181,7 @@ class MonarchLanguageRuleScope(
 
         @MonarchDSL
         infix fun String.action(action: MonarchLanguageAction): MonarchLanguageRule {
-            val result = MonarchLanguageRule.ShortRule1(UnionType(this), action)
+            val result = MonarchLanguageRule.ShortRule1(this, action)
             ruleList.add(result)
             return result
         }
@@ -213,16 +213,20 @@ class MonarchLanguageRuleScope(
 
         @MonarchDSL
         infix fun String.action(token: String): MonarchLanguageActionWithNextStateScope {
-            val action = buildMonarchLanguageAction {
-                this.token = token
-            }
-            action(action)
-            return MonarchLanguageActionWithNextStateScope(action)
+            val rule = MonarchLanguageRule.ShortRule2(
+                this,
+                buildMonarchLanguageAction {
+                    this.token = token
+                },
+                ""
+            )
+            ruleList.add(rule)
+            return MonarchLanguageActionWithNextStateScope(rule)
         }
 
         @MonarchDSL
         infix fun Regex.action(action: MonarchLanguageAction): MonarchLanguageRule {
-            val result = MonarchLanguageRule.ShortRule1(UnionType(this), action)
+            val result = MonarchLanguageRule.ShortRule1(this, action)
             ruleList.add(result)
             return result
         }
@@ -254,11 +258,15 @@ class MonarchLanguageRuleScope(
 
         @MonarchDSL
         infix fun Regex.action(token: String): MonarchLanguageActionWithNextStateScope {
-            val action = buildMonarchLanguageAction {
-                this.token = token
-            }
-            action(action)
-            return MonarchLanguageActionWithNextStateScope(action)
+            val rule = MonarchLanguageRule.ShortRule2(
+                this,
+                buildMonarchLanguageAction {
+                    this.token = token
+                },
+                ""
+            )
+            ruleList.add(rule)
+            return MonarchLanguageActionWithNextStateScope(rule)
         }
     }
 
@@ -365,10 +373,10 @@ class MonarchLanguageActionArrayScope {
 
 
 @JvmInline
-value class MonarchLanguageActionWithNextStateScope(private val action: MonarchLanguageAction.ExpandedLanguageAction) {
+value class MonarchLanguageActionWithNextStateScope(private val rule: MonarchLanguageRule.ShortRule2) {
     @MonarchDSL
     infix fun state(state: String) {
-        action.next = state
+        rule.nextState = state
     }
 }
 
@@ -472,7 +480,7 @@ infix fun String.and(array: List<String>) {
 context(MonarchLanguageScope)
 @MonarchDSL
 infix fun String.and(regex: Regex) {
-    attrMap[this] = UnionType<String, Regex>(regex)
+    attrMap[this] = regex
 }
 
 context(MonarchLanguageScope)
@@ -483,7 +491,7 @@ val String.r: Regex
 context(MonarchLanguageScope)
 @MonarchDSL
 infix fun String.and(regexRaw: String) {
-    attrMap[this] = UnionType<String, Regex>(regexRaw)
+    attrMap[this] = regexRaw
 }
 
 context(MonarchLanguageScope)

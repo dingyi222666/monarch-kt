@@ -26,7 +26,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
-import io.github.dingyi222666.monarch.extension.UnionType
 import io.github.dingyi222666.monarch.types.MonarchLanguageAction
 import io.github.dingyi222666.monarch.types.MonarchLanguageRule
 
@@ -95,9 +94,9 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
         // [regex, action, next]
         val result = if (nextToken == JsonReader.Token.STRING) {
             val nextState = reader.nextString()
-            MonarchLanguageRule.ShortRule2(UnionType(regex), action, nextState)
+            MonarchLanguageRule.ShortRule2(regex, action, nextState)
         } else {
-            MonarchLanguageRule.ShortRule1(UnionType(regex), action)
+            MonarchLanguageRule.ShortRule1(regex, action)
         }
 
         reader.endArray()
@@ -133,7 +132,7 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
             throw JsonDataException("Missing regex or action in ${reader.path}")
         }
 
-        return MonarchLanguageRule.ShortRule1(UnionType(regex), action)
+        return MonarchLanguageRule.ShortRule1(regex, action)
     }
 
     // string
@@ -233,10 +232,130 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
         return result
     }
 
+    private fun writeAction(writer: JsonWriter, action: MonarchLanguageAction) {
+        when (action) {
+            is MonarchLanguageAction.ShortLanguageAction -> {
+                writer.value(action.token)
+            }
+
+            is MonarchLanguageAction.ActionArray -> {
+                writer.beginArray()
+                for (action in action.actions) {
+                    writeAction(writer, action)
+                }
+                writer.endArray()
+            }
+
+            is MonarchLanguageAction.ExpandedLanguageAction -> {
+                writer.beginObject()
+
+                if (action.group != null) {
+                    writer.name("group")
+                    writer.beginArray()
+                    for (sub in action.group) {
+                        writeAction(writer, sub)
+                    }
+                }
+
+                if (action.cases != null) {
+                    writer.name("cases")
+                    writer.beginObject()
+                    for ((guard, action) in action.cases) {
+                        writer.name(guard)
+                        writeAction(writer, action)
+                    }
+                    writer.endObject()
+                }
+
+                if (action.token != null) {
+                    writer.name("token")
+                    writer.value(action.token)
+                }
+
+                if (action.next != null) {
+                    writer.name("next")
+                    writer.value(action.next)
+                }
+
+                if (action.switchTo != null) {
+                    writer.name("switchTo")
+                    writer.value(action.switchTo)
+                }
+
+                if (action.goBack != null) {
+                    writer.name("goBack")
+                    writer.value(action.goBack)
+                }
+
+                if (action.bracket != null) {
+                    writer.name("bracket")
+                    writer.value(action.bracket)
+                }
+
+                if (action.nextEmbedded != null) {
+                    writer.name("nextEmbedded")
+                    writer.value(action.nextEmbedded)
+                }
+
+                if (action.log != null) {
+                    writer.name("log")
+                    writer.value(action.log)
+                }
+
+
+                writer.endObject()
+            }
+        }
+    }
+
+    private fun writeRule(writer: JsonWriter, rule: MonarchLanguageRule) {
+        when (rule) {
+            is MonarchLanguageRule.ExpandedLanguageRule -> {
+                writer.beginObject()
+                writer.name("include")
+                writer.value(rule.include)
+                writer.endObject()
+            }
+
+            is MonarchLanguageRule.ShortRule1 -> {
+                writer.beginArray()
+                val regex = rule.regex
+                writer.value(if (regex is String) regex else (rule.regex as Regex).pattern)
+                writeAction(writer, rule.action)
+                writer.endArray()
+            }
+
+            is MonarchLanguageRule.ShortRule2 -> {
+                writer.beginArray()
+                val regex = rule.regex
+                writer.value(if (regex is String) regex else (rule.regex as Regex).pattern)
+                writeAction(writer, rule.action)
+                writer.value(rule.nextState)
+                writer.endArray()
+            }
+        }
+    }
+
     override fun toJson(writer: JsonWriter, value: Map<String, List<MonarchLanguageRule>>?) {
         if (value == null) {
             writer.nullValue()
             return
         }
+
+        writer.beginObject()
+
+        for ((key, rules) in value) {
+            writer.name(key)
+
+            writer.beginArray()
+
+            for (rule in rules) {
+                writeRule(writer, rule)
+            }
+
+            writer.endArray()
+        }
+
+        writer.endObject()
     }
 }
