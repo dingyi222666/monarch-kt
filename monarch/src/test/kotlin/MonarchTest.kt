@@ -57,6 +57,9 @@ class MonarchTest {
         val SQL_QUERY_START = "(SELECT|INSERT|UPDATE|DELETE|CREATE|REPLACE|ALTER|WITH)"
 
         val tokenizer = buildLanguage("test1") {
+            brackets {
+
+            }
             tokenizer {
                 root {
                     "(\"\"\")${SQL_QUERY_START}" actionArray {

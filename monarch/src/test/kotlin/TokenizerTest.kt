@@ -19,6 +19,7 @@
 import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.loadMonarchJson
+import io.github.dingyi222666.monarch.loader.toKotlinDSL
 import io.github.dingyi222666.monarch.loader.toMonarchJson
 import kotlin.test.Test
 
@@ -41,7 +42,13 @@ class TokenizerTest {
             println(result.tokens)
         }
 
-        println(testLanguage.monarchLanguage.toMonarchJson())
+        //println(testLanguage.monarchLanguage.toMonarchJson())
+        val buffer = StringBuilder()
+        val spec = testLanguage.monarchLanguage.toKotlinDSL()
+        println(spec.defaultImports)
+        spec.defaultImports
+        spec.writeTo(buffer)
+        println(buffer)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -62,6 +69,7 @@ class TokenizerTest {
 
     val testLanguage = buildLanguage("testLanguage") {
         // defaultToken = ""
+
 
         keywords(
             "abstract", "continue", "for", "new", "switch", "assert", "goto", "do",

@@ -32,7 +32,9 @@ repositories {
 dependencies {
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.1")
     implementation("com.squareup.moshi:moshi:1.15.1")
+    compileOnly("com.squareup:kotlinpoet:1.16.0")
     testImplementation(kotlin("test"))
+    testImplementation("com.squareup:kotlinpoet:1.16.0")
 }
 
 tasks.test {

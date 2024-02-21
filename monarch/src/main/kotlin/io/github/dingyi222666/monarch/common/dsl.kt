@@ -356,10 +356,11 @@ class MonarchLanguageActionArrayScope {
     }
 
     inline fun action(token: String, block: MonarchLanguageActionScope.() -> Unit) {
-        group.add(buildMonarchLanguageAction {
-            this.token = token
-            block.invoke(this)
-        })
+        group.add(
+            buildMonarchLanguageAction {
+                this.token = token
+                block.invoke(this)
+            })
     }
 
     inline fun actionArray(block: MonarchLanguageActionArrayScope.() -> Unit) {
