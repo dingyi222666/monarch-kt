@@ -47,12 +47,11 @@ fun IMonarchLanguage.toKotlinDSL(
     packageName: String = "io.github.dingyi222666.monarch.languages",
     fileName: String = "MonarchLanguage",
     languageName: String = "Monarch"
-): FileSpec {
-
+): String {
     val codeBlock = compileMonarchLanguageToKotlinDSL(this, CodeBlock.builder())
 
     val file = FileSpec.builder(packageName, fileName)
-        .addDefaultPackageImport("io.github.dingyi222666.monarch.common")
+        .addImport("io.github.dingyi222666.monarch.common","LanguageScope")
         .addKotlinDefaultImports(includeJvm = true)
         .addProperty(PropertySpec.builder(
             // val Monarch
@@ -67,8 +66,13 @@ fun IMonarchLanguage.toKotlinDSL(
             // =
             codeBlock
         ).build())
+        .build()
 
-    return file.build()
+    val builder = StringBuilder()
+
+    file.writeTo(builder)
+
+    return builder.toString().replace("io.github.dingyi222666.monarch.common.LanguageScope", "io.github.dingyi222666.monarch.common.*")
 }
 
 private fun compileMonarchLanguageToKotlinDSL(language: IMonarchLanguage, codeBlock: CodeBlock.Builder): CodeBlock {
@@ -276,24 +280,7 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                 //   ....
                 //  }
                 is MonarchLanguageAction.ActionArray -> {
-                    val subCodeBlock = CodeBlock.builder()
-                    compileMonarchLanguageArrayActionToKotlinDSL(action, subCodeBlock)
-
-                    codeBlock.add(
-                        "%P actionArray {\n", regexToString(rule.regex)
-                    )
-                    codeBlock.indent()
-
-                    codeBlock.add(
-                        "%L", subCodeBlock.build()
-                    )
-
-                    codeBlock.unindent()
-
-                    codeBlock.add("} state %S", rule.nextState)
-
-                    // \n
-                    codeBlock.addStatement("")
+                    throw  Exception("Unsupported type of $action in short rules 2")
 
                 }
 
@@ -301,24 +288,28 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                 //   token = 111
                 // } state "xx"
                 is MonarchLanguageAction.ExpandedLanguageAction -> {
-                    val subCodeBlock = CodeBlock.builder()
-                    compileMonarchExpandedLanguageActionToKotlinDSL(action, subCodeBlock)
 
-                    codeBlock.add(
-                        "%P action {\n", regexToString(rule.regex)
+                    if (action.token == null ||
+                        action.goBack != null ||
+                        action.switchTo != null ||
+                        action.cases != null ||
+                        action.nextEmbedded != null  ||
+                        action.group != null
+                    ) {
+                        codeBlock.beginControlFlow("%P action", regexToString(rule.regex))
+                        action.next = rule.nextState
+                        compileMonarchExpandedLanguageActionToKotlinDSL(action, codeBlock)
+                        codeBlock.endControlFlow()
+                        return
+                    }
+
+
+                    codeBlock.addStatement(
+                        "%P action %S state %S",
+                        regexToString(rule.regex),
+                        action.token,
+                        rule.nextState
                     )
-                    codeBlock.indent()
-
-                    codeBlock.add(
-                        "%L", subCodeBlock.build()
-                    )
-
-                    codeBlock.unindent()
-
-                    codeBlock.add("} state %S", rule.nextState)
-
-                    // \n
-                    codeBlock.addStatement("")
 
                 }
             }

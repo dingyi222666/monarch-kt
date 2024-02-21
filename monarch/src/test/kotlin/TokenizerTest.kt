@@ -43,12 +43,10 @@ class TokenizerTest {
         }
 
         //println(testLanguage.monarchLanguage.toMonarchJson())
-        val buffer = StringBuilder()
-        val spec = testLanguage.monarchLanguage.toKotlinDSL()
-        println(spec.defaultImports)
-        spec.defaultImports
-        spec.writeTo(buffer)
-        println(buffer)
+      
+        val dsl = testLanguage.monarchLanguage.toKotlinDSL()
+
+        println(dsl)
     }
 
     @OptIn(ExperimentalStdlibApi::class)
