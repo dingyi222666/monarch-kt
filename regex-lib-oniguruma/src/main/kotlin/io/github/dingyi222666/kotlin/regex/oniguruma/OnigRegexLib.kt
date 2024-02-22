@@ -23,11 +23,14 @@
 package io.github.dingyi222666.kotlin.regex.oniguruma
 
 import io.github.dingyi222666.kotlin.regex.*
+import org.joni.Syntax
 
 class OnigRegexLib(
-    cacheSize: Int = 100
+    cacheSize: Int = 10000
 ) : RegexLib {
     private val cache = LRUCache<CharSequence, OnigRegex>(cacheSize)
+
+    var syntax = Syntax.ECMAScript
 
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
         return OnigRegexScanner(patterns, this)
@@ -36,11 +39,11 @@ class OnigRegexLib(
 
     override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): OnigRegex {
         val cached = cache.get(str)
-        return cached ?: OnigRegex(str, regexOption).also { cache.put(str, it) }
+        return cached ?: OnigRegex(str, regexOption, syntax).also { cache.put(str, it) }
     }
 
     override fun compile(str: CharSequence, vararg regexOption: RegexOption): OnigRegex {
-       return compile(str, regexOption.toSet())
+        return compile(str, regexOption.toSet())
     }
 }
 

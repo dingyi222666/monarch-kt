@@ -106,7 +106,7 @@ class MonarchTokenizer(
             var regex = rule.regex
             val regexSource = rule.regex.pattern
             if (regexSource.substring(0, 4) == "^(?:" && regexSource.last() == ')') {
-                regex = GlobalRegexLib.compile(regexSource.substring(4, regexSource.length - 1), regex.options)
+                regex = regexLib.compile(regexSource.substring(4, regexSource.length - 1), regex.options)
             }
 
             val result = regex.search(line)?.range?.first ?: -1

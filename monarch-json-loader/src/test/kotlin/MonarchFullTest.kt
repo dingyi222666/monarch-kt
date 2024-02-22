@@ -20,6 +20,7 @@ class MonarchFullTest {
 		runTests("azcli")
 	}
 
+
 	@Test
 	fun `tokenizationbat`() {
 		runTests("bat")

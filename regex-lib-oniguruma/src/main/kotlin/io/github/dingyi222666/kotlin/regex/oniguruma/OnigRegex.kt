@@ -23,47 +23,45 @@
 package io.github.dingyi222666.kotlin.regex.oniguruma
 
 
-import io.github.dingyi222666.kotlin.regex.MatchResult
-import io.github.dingyi222666.kotlin.regex.Regex
-import io.github.dingyi222666.kotlin.regex.RegexOption
-import io.github.dingyi222666.kotlin.regex.toInt
+import io.github.dingyi222666.kotlin.regex.*
 import org.jcodings.specific.UTF8Encoding
 import org.joni.Matcher
 import org.joni.Option
 import org.joni.Syntax
 import org.joni.WarnCallback
 import java.nio.charset.StandardCharsets
+import java.util.regex.Pattern
 import kotlin.math.max
 
 typealias NativeRegex = org.joni.Regex
 
 class OnigRegex(
     pattern: CharSequence,
-    regexOption: Set<RegexOption>? = null
+    regexOption: Set<RegexOption>? = null,
+    syntax: Syntax = Syntax.DEFAULT
 ) : Regex() {
     override val options = regexOption ?: setOf(RegexOption.NONE)
     override val pattern by lazy(LazyThreadSafetyMode.NONE) { pattern.toString() }
 
 
     private val nativeRegex =
-       /* kotlin.runCatching*/ run {
-        val removeGlobalPattern = this.pattern
-            .removePrefix("\\G")
-            .toByteArray(StandardCharsets.UTF_8)
-        NativeRegex(
-            removeGlobalPattern,
-            0,
-            removeGlobalPattern.size,
-            Option.CAPTURE_GROUP or options.toInt(),
-            UTF8Encoding.INSTANCE,
-            Syntax.DEFAULT,
-            WarnCallback.DEFAULT
-        )
-    }/*.getOrElse {
+        kotlin.runCatching {
+            val removeGlobalPattern = this.pattern
+                .removePrefix("\\G")
+                .toByteArray(StandardCharsets.UTF_8)
             NativeRegex(
-                ByteArray(0), 0, 0, Option.CAPTURE_GROUP, UTF8Encoding.INSTANCE, Syntax.DEFAULT, WarnCallback.DEFAULT
+                removeGlobalPattern,
+                0,
+                removeGlobalPattern.size,
+                Option.CAPTURE_GROUP or options.toInt(),
+                UTF8Encoding.INSTANCE,
+                Syntax.DEFAULT,
+                WarnCallback.DEFAULT
             )
-        }*/
+        }.getOrElse {
+           throw    IllegalArgumentException("Invalid pattern: $pattern")
+
+        }
 
     private var lastSearchString: CharSequence? = null
 

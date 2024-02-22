@@ -31,7 +31,8 @@ import kotlin.test.assertEquals
 
 
 fun runTests(language: String) {
-    applyOnigRegexLibToGlobal()
+    //applyRe2JRegexLibToGlobal()
+    //applyOnigRegexLibToGlobal()
 
     val languageRegistry = LanguageRegistry()
     val (languageId, tests) = registerLanguage(languageRegistry, mutableListOf(language))

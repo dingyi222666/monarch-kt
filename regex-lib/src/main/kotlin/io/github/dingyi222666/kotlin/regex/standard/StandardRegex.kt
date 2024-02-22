@@ -94,7 +94,24 @@ class StandardRegex(
 
     override val options = regexOption ?: setOf(RegexOption.NONE)
 
-    private val nativeRegex = Pattern.compile(pattern.toString(), regexOption?.toInt() ?: 0)
+    private val nativeRegex =
+        kotlin.runCatching {
+            Pattern.compile(pattern.toString(), regexOption?.toInt() ?: 0)
+        }.getOrElse {
+            val rawPatternString = pattern.toString()
+
+            // fuck ecma regex...
+            var exception: Exception? = null
+            for (pattern in patterns) {
+                try {
+                    return@getOrElse Pattern.compile(pattern.invoke(rawPatternString), regexOption?.toInt() ?: 0)
+                } catch (e: Exception) {
+                    exception = e
+                    continue
+                }
+            }
+            throw Exception("Can't compile regex $pattern $exception")
+        }
 
     override val pattern: String
         get() = nativeRegex.pattern()
@@ -171,4 +188,17 @@ class StandardRegex(
 
         return sb.toString()
     }
+
+    companion object {
+        private val patterns = arrayOf(
+            { rawPattern: String -> rawPattern.replace("[[", "[") },
+            { rawPattern: String -> rawPattern.replace("{", "\\{") },
+            { rawPattern: String -> rawPattern.replace("{", "\\{").replace("^", "\\^") },
+            { rawPattern: String -> rawPattern.replace("([", "(\\[") },
+            { rawPattern: String -> rawPattern.replace("\\", "\\\\") },
+            { rawPattern: String -> rawPattern.replace("\\p{", "").replace("}", "") }
+        )
+    }
+
 }
+

@@ -91,8 +91,12 @@ class Re2JRegex(
 
     override val options = regexOption ?: setOf(RegexOption.NONE)
 
-    private val nativeRegex =
+    private val nativeRegex = kotlin.runCatching {
         Pattern.compile(pattern.toString(), regexOption?.map { it.toRe2JRegexOption() }?.toInt() ?: 0)
+    }.getOrElse {
+        val rawPattern = pattern.toString().replace("{?", "\\{?")
+        Pattern.compile(rawPattern, regexOption?.map { it.toRe2JRegexOption() }?.toInt() ?: 0)
+    }
 
     override val pattern: String
         get() = nativeRegex.pattern()
