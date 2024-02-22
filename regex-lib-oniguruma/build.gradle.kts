@@ -16,32 +16,27 @@
  * limitations under the License.
  */
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        google()
-    }
-}
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+    kotlin("jvm") version "1.9.0"
 }
 
+group = "io.github.dingyi222666.kotlin.regex-lib"
+version = "1.0.0"
 
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-        google()
-        maven { url = uri("https://jitpack.io") }
-    }
+repositories {
+    mavenCentral()
 }
 
+dependencies {
+    testImplementation(kotlin("test"))
+    implementation(project(":regex-lib"))
+    implementation("org.jruby.joni:joni:2.1.43")
+}
 
-rootProject.name = "monarch-kt"
-
-include("monarch")
-include("monarch-json-loader")
-include("regex-lib")
-include("regex-lib-re2j")
-include("regex-lib-oniguruma")
+tasks.test {
+    useJUnitPlatform()
+}
+kotlin {
+    jvmToolchain(17)
+}

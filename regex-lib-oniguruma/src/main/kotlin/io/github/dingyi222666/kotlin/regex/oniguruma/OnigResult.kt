@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024  dingyi
+ * Copyright (C) 2024-2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,27 @@
  * limitations under the License.
  */
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        mavenCentral()
-        google()
+package io.github.dingyi222666.kotlin.regex.oniguruma
+
+import org.joni.Region
+
+class OnigResult(val region: Region, var indexInScanner: Int) {
+
+    fun locationAt(index: Int): Int {
+        val bytes = region.beg[index]
+        if (bytes > 0) {
+            return bytes
+        }
+        return 0
+    }
+
+    val count = region.numRegs
+
+    fun lengthAt(index: Int): Int {
+        val bytes = region.end[index] - region.beg[index]
+        if (bytes > 0) {
+            return bytes
+        }
+        return 0
     }
 }
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
-}
-
-
-dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-        google()
-        maven { url = uri("https://jitpack.io") }
-    }
-}
-
-
-rootProject.name = "monarch-kt"
-
-include("monarch")
-include("monarch-json-loader")
-include("regex-lib")
-include("regex-lib-re2j")
-include("regex-lib-oniguruma")

@@ -29,13 +29,13 @@ import io.github.dingyi222666.monarch.types.MonarchLanguageBracket
 import io.github.dingyi222666.monarch.types.MonarchLanguageRule
 
 internal val MoshiRoot: Moshi = Moshi.Builder()
-    .add<IMonarchLanguage>(MonarchLanguageAdapter())
-    .add<List<MonarchLanguageBracket>>(MonarchLanguageBracketAdapter())
-    .add<Map<String, List<MonarchLanguageRule>>>(MonarchLanguageRuleAdapter())
+    .addLast<IMonarchLanguage>(MonarchLanguageAdapter())
+    .addLast<List<MonarchLanguageBracket>>(MonarchLanguageBracketAdapter())
+    .addLast<Map<String, List<MonarchLanguageRule>>>(MonarchLanguageRuleAdapter())
     .build()
 
-inline fun <reified T> Moshi.Builder.add(adapter: JsonAdapter<T>): Moshi.Builder {
-    add(T::class.java, adapter)
+inline fun <reified T> Moshi.Builder.addLast(adapter: JsonAdapter<T>): Moshi.Builder {
+    addLast(T::class.java, adapter)
     return this
 }
 

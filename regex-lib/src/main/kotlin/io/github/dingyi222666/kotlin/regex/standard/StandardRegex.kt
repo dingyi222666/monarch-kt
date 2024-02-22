@@ -30,7 +30,7 @@ class StandardRegexLib(
     private val cache = LRUCache<CharSequence, StandardRegex>(cacheSize)
 
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
-        return StandardRegexScanner(patterns)
+        return StandardRegexScanner(patterns, this)
     }
 
 
@@ -41,17 +41,18 @@ class StandardRegexLib(
 }
 
 class StandardRegexScanner(
-    patterns: Array<CharSequence>
+    patterns: Array<CharSequence>,
+    regexLib: StandardRegexLib
 ) : RegexScanner {
 
-    private val regexes = patterns.map { StandardRegex(it.toString()) }
+    private val regexps = patterns.map { regexLib.compile(it) }
 
     override fun findNext(source: CharSequence, startPosition: Int): CaptureIndex? {
         var bestLocation = 0
         var bestResult: MatchResult? = null
         var indexInScanner = 0
 
-        for ((idx, regex) in regexes.withIndex()) {
+        for ((idx, regex) in regexps.withIndex()) {
             val result = regex.search(source, startPosition, true)
             if (result != null && result.count > 0) {
                 val location = result.range.first
@@ -66,13 +67,20 @@ class StandardRegexScanner(
             }
         }
 
+
         return if (bestResult == null) {
             null
-        } else CaptureIndex(
-            start = indexInScanner,
-            range = bestResult.range
-        )
+        } else {
+            val ranges = Array(bestResult.count) { index ->
+                bestResult.groups[index].range
+            }
+            CaptureIndex(
+                start = indexInScanner,
+                range = ranges
+            )
+        }
     }
+
 
     override fun dispose() {
         // no-op

@@ -1,5 +1,6 @@
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
+import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
 import io.github.dingyi222666.kotlin.regex.re2j.applyRe2JRegexLibToGlobal
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
@@ -30,7 +31,7 @@ import kotlin.test.assertEquals
 
 
 fun runTests(language: String) {
-    applyRe2JRegexLibToGlobal()
+    applyOnigRegexLibToGlobal()
 
     val languageRegistry = LanguageRegistry()
     val (languageId, tests) = registerLanguage(languageRegistry, mutableListOf(language))
@@ -42,15 +43,15 @@ fun runTests(language: String) {
 
     val tokenizer = languageRegistry.getTokenizer(languageId) ?: throw Exception("Language $language not found")
 
-    for (test1 in tests) {
+    for ((index,test1) in tests.withIndex()) {
         var state = tokenizer.getInitialState();
 
-        for (subTest in test1) {
+        for ((subIndex,subTest) in test1.withIndex()) {
             val result = tokenizer.tokenize(subTest.line, true, state)
             state = result.endState;
             assertEquals(subTest.tokens, result.tokens.map {
                 Token(it.offset, it.type)
-            })
+            },"The tokens are not equal in line root[$index][$subIndex]: ${subTest.line}")
         }
     }
 }

@@ -106,4 +106,10 @@ class LRUCache<K, V>(private val capacity: Int) {
         cache.remove(lastNode.key)
         remove(lastNode)
     }
+
+    fun clear() {
+        cache.clear()
+        head = null
+        tail = null
+    }
 }

@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/monarch" />
             <option value="$PROJECT_DIR$/monarch-json-loader" />
             <option value="$PROJECT_DIR$/regex-lib" />
+            <option value="$PROJECT_DIR$/regex-lib-oniguruma" />
             <option value="$PROJECT_DIR$/regex-lib-re2j" />
           </set>
         </option>

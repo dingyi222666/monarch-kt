@@ -61,8 +61,26 @@ abstract class Regex {
 
 data class CaptureIndex(
     val start: Int,
-    val range: IntRange
-)
+    val range: Array<IntRange>
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CaptureIndex
+
+        if (start != other.start) return false
+        if (!range.contentEquals(other.range)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = start
+        result = 31 * result + range.contentHashCode()
+        return result
+    }
+}
 
 data class MatchResult(
     val value: CharSequence,

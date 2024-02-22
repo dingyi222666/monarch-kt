@@ -14,10 +14,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Initial code from https://github.com/microsoft/vscode
- * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
- * Initial license: MIT
+
  */
 
 package io.github.dingyi222666.kotlin.regex.re2j
@@ -32,7 +29,7 @@ class Re2JRegexLib(
     private val cache = LRUCache<CharSequence, Re2JRegex>(cacheSize)
 
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
-        return StandardRegexScanner(patterns)
+        return StandardRegexScanner(patterns, this)
     }
 
 
@@ -43,17 +40,18 @@ class Re2JRegexLib(
 }
 
 class StandardRegexScanner(
-    patterns: Array<CharSequence>
+    patterns: Array<CharSequence>,
+    regexLib: Re2JRegexLib
 ) : RegexScanner {
 
-    private val regexes = patterns.map { Re2JRegex(it.toString()) }
+    private val regexps = patterns.map { regexLib.compile(it) }
 
     override fun findNext(source: CharSequence, startPosition: Int): CaptureIndex? {
         var bestLocation = 0
         var bestResult: MatchResult? = null
         var indexInScanner = 0
 
-        for ((idx, regex) in regexes.withIndex()) {
+        for ((idx, regex) in regexps.withIndex()) {
             val result = regex.search(source, startPosition)
             if (result != null && result.count > 0) {
                 val location = result.range.first
@@ -70,10 +68,15 @@ class StandardRegexScanner(
 
         return if (bestResult == null) {
             null
-        } else CaptureIndex(
-            start = indexInScanner,
-            range = bestResult.range
-        )
+        } else {
+            val ranges = Array(bestResult.count) { index ->
+                bestResult.groups[index].range
+            }
+            CaptureIndex(
+                start = indexInScanner,
+                range = ranges
+            )
+        }
     }
 
     override fun dispose() {
