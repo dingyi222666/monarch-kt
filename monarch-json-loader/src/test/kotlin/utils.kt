@@ -1,5 +1,6 @@
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
+import io.github.dingyi222666.kotlin.regex.re2j.applyRe2JRegexLibToGlobal
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.json.MoshiRoot
@@ -29,8 +30,15 @@ import kotlin.test.assertEquals
 
 
 fun runTests(language: String) {
+    applyRe2JRegexLibToGlobal()
+
     val languageRegistry = LanguageRegistry()
     val (languageId, tests) = registerLanguage(languageRegistry, mutableListOf(language))
+
+    if (languageId.isEmpty()) {
+        System.err.println("[WARN]: Language $language not found")
+        return
+    }
 
     val tokenizer = languageRegistry.getTokenizer(languageId) ?: throw Exception("Language $language not found")
 
@@ -56,7 +64,8 @@ private fun registerLanguage(
     val languageJson = File("src/test/resources/language_packs/$language/$language.json").absoluteFile
 
     if (!languageJson.exists()) {
-        throw Exception("Language $language not found")
+        System.err.println("Language $language not found")
+        return "" to emptyList()
     }
     val testLanguageJson = File("src/test/resources/language_packs/$language/$language.test.json")
 

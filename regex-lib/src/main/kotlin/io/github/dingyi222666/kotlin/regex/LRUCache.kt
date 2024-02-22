@@ -102,7 +102,7 @@ class LRUCache<K, V>(private val capacity: Int) {
     }
 
     private fun evictLast() {
-        val lastNode = tail ?: throw IllegalStateException("LRUCache is empty")
+        val lastNode = tail ?: return
         cache.remove(lastNode.key)
         remove(lastNode)
     }

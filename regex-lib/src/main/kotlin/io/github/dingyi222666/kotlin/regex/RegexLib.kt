@@ -47,7 +47,7 @@ abstract class Regex {
 
     abstract fun search(input: CharSequence, startPosition: Int, cached: Boolean = true): MatchResult?
 
-    fun search(input: CharSequence, cached: Boolean = false) = search(input, 0, cached)
+    fun search(input: CharSequence, cached: Boolean = true) = search(input, 0, cached)
 
     abstract fun replace(source: String, transform: (result: MatchGroup) -> String): String
 
@@ -135,12 +135,12 @@ object GlobalRegexLib : RegexLib {
     override fun compile(str: CharSequence, regexOption: Set<RegexOption>?) = defaultRegexLib.compile(str, regexOption)
 }
 
-internal interface FlagEnum {
+interface FlagEnum {
     val value: Int
     val mask: Int
 }
 
-internal fun Iterable<FlagEnum>.toInt(): Int =
+fun Iterable<FlagEnum>.toInt(): Int =
     this.fold(0) { value, option -> value or option.value }
 
 internal inline fun <reified T> fromInt(value: Int): Set<T> where T : FlagEnum, T : Enum<T> =
@@ -173,8 +173,6 @@ enum class RegexOption(override val value: Int, override val mask: Int = value) 
      */
     LITERAL(Pattern.LITERAL),
 
-    //    // Unicode case is enabled by default with the IGNORE_CASE
-//    /** Enables Unicode-aware case folding. */
     UNICODE_CASE(Pattern.UNICODE_CASE),
 
     /** Enables Unix lines mode. In this mode, only the `'\n'` is recognized as a line terminator. */

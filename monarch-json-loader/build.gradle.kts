@@ -12,9 +12,9 @@ repositories {
 
 dependencies {
     implementation(project(":monarch"))
+    implementation(project(":regex-lib-re2j"))
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.1")
     implementation("com.squareup.moshi:moshi:1.15.1")
-
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test"))

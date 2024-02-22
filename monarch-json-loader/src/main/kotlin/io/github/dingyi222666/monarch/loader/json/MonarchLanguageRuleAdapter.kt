@@ -87,9 +87,12 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
         // fuck escape
         val regex = reader.nextString()
             .withEscapes()
-
-
         // action can be a string or an object, ...
+
+        if (reader.peek() == JsonReader.Token.END_ARRAY) {
+            reader.endArray()
+            return MonarchLanguageRule.ShortRule1(regex, null)
+        }
 
         val action = parseAction(reader)
 
@@ -368,7 +371,7 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
 }
 
 fun String.withEscapes(): String {
-    return replace("\\", "\\\\")
+    return this //replace("\\", "\\\\")
 }
 
 fun String.withoutEscapes(): String {

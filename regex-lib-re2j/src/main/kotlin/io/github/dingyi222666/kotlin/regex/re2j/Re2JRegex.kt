@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024  dingyi
+ * Copyright (C) 2024-2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,28 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex.standard
+package io.github.dingyi222666.kotlin.regex.re2j
 
+import com.google.re2j.Pattern
 import io.github.dingyi222666.kotlin.regex.*
-import java.util.regex.Pattern
 
 
-class StandardRegexLib(
+class Re2JRegexLib(
     cacheSize: Int = 20
 ) : RegexLib {
-
-    private val cache = LRUCache<CharSequence, StandardRegex>(cacheSize)
+    private val cache = LRUCache<CharSequence, Re2JRegex>(cacheSize)
 
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
         return StandardRegexScanner(patterns)
     }
 
 
-    override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): StandardRegex {
+    override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): Re2JRegex {
         val cached = cache.get(str)
-        return cached ?: StandardRegex(str, regexOption).also { cache.put(str, it) }
+        return cached ?: Re2JRegex(str, regexOption).also { cache.put(str, it) }
     }
 }
 
@@ -44,7 +46,7 @@ class StandardRegexScanner(
     patterns: Array<CharSequence>
 ) : RegexScanner {
 
-    private val regexes = patterns.map { StandardRegex(it.toString()) }
+    private val regexes = patterns.map { Re2JRegex(it.toString()) }
 
     override fun findNext(source: CharSequence, startPosition: Int): CaptureIndex? {
         var bestLocation = 0
@@ -52,7 +54,7 @@ class StandardRegexScanner(
         var indexInScanner = 0
 
         for ((idx, regex) in regexes.withIndex()) {
-            val result = regex.search(source, startPosition, true)
+            val result = regex.search(source, startPosition)
             if (result != null && result.count > 0) {
                 val location = result.range.first
                 if (bestResult == null || location < bestLocation) {
@@ -79,14 +81,15 @@ class StandardRegexScanner(
     }
 }
 
-class StandardRegex(
+class Re2JRegex(
     pattern: CharSequence,
     regexOption: Set<RegexOption>? = null
 ) : Regex() {
 
     override val options = regexOption ?: setOf(RegexOption.NONE)
 
-    private val nativeRegex = Pattern.compile(pattern.toString(), regexOption?.toInt() ?: 0)
+    private val nativeRegex =
+        Pattern.compile(pattern.toString(), regexOption?.map { it.toRe2JRegexOption() }?.toInt() ?: 0)
 
     override val pattern: String
         get() = nativeRegex.pattern()
@@ -101,7 +104,11 @@ class StandardRegex(
         return nativeRegex.matcher(input.toString()).find()
     }
 
-    override fun search(input: CharSequence, startPosition: Int, cached: Boolean): MatchResult? {
+    override fun search(
+        input: CharSequence,
+        startPosition: Int,
+        cached: Boolean
+    ): MatchResult? {
         if (cached) {
             synchronized(this) {
                 val lastSearchResult0 = this.lastSearchResult
@@ -123,24 +130,23 @@ class StandardRegex(
         return result
     }
 
-    private fun searchInternal(input: CharSequence, startPosition: Int): MatchResult? {
+    private fun searchInternal(
+        input: CharSequence,
+        startPosition: Int
+    ): MatchResult? {
         val matcher = nativeRegex.matcher(input)
 
         if (!matcher.find(startPosition)) {
             return null
         }
 
-        val groupCount = matcher.groupCount()
-        val groups = Array(groupCount + 1) { i ->
+        val groups = Array(matcher.groupCount() + 1) { i ->
             val group = matcher.group(i) ?: ""
-            val start = matcher.start(i) ?: 0
-            val end = matcher.end(i) ?: 0
             MatchGroup(
                 value = group,
-                range = IntRange(start, end)
+                range = IntRange(matcher.start(i), matcher.end(i))
             )
         }
-
         return MatchResult(
             value = matcher.group(),
             range = matcher.start()..matcher.end(),
@@ -163,4 +169,40 @@ class StandardRegex(
 
         return sb.toString()
     }
+}
+
+
+/**
+ * Provides enumeration values to use to set regular expression options.
+ */
+enum class Re2JRegexOption(override val value: Int, override val mask: Int = value) : FlagEnum {
+    // common
+
+    NONE(0),
+
+    /** Enables case-insensitive matching. Case comparison is Unicode-aware. */
+    IGNORE_CASE(Pattern.CASE_INSENSITIVE),
+
+    /** Enables multiline mode.
+     *
+     * In multiline mode the expressions `^` and `$` match just after or just before,
+     * respectively, a line terminator or the end of the input sequence. */
+    MULTILINE(Pattern.MULTILINE),
+
+    //jvm-specific
+
+
+    /** Enables the mode, when the expression `.` matches any character, including a line terminator. */
+    DOT_MATCHES_ALL(Pattern.DOTALL),
+
+}
+
+fun RegexOption.toRe2JRegexOption() = when (this) {
+    RegexOption.IGNORE_CASE -> Re2JRegexOption.IGNORE_CASE
+    RegexOption.MULTILINE -> Re2JRegexOption.MULTILINE
+    else -> throw IllegalArgumentException("Unsupported regex option: $this")
+}
+
+fun applyRe2JRegexLibToGlobal() {
+    GlobalRegexLib.defaultRegexLib = Re2JRegexLib()
 }

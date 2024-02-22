@@ -15,35 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 
 plugins {
-    kotlin("jvm")
+    kotlin("jvm") version "1.9.0"
 }
 
-group = "io.github.dingyi222666.kotlin.monarch"
-version = "1.0-SNAPSHOT"
+group = "io.github.dingyi222666.kotlin.regex-lib"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("com.squareup:kotlinpoet:1.16.0")
-    api(project(":regex-lib"))
     testImplementation(kotlin("test"))
-    testImplementation("com.squareup:kotlinpoet:1.16.0")
+    implementation(project(":regex-lib"))
+    implementation("com.google.re2j:re2j:1.6")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
-
 kotlin {
     jvmToolchain(17)
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
-    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
