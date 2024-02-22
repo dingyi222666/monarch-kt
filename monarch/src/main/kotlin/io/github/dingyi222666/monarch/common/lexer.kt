@@ -374,7 +374,7 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
 fun IMonarchLanguage.compile(languageId: String, regexLib: RegexLib = GlobalRegexLib): IMonarchLexer {
 
     // Create our lexer
-    val lexer = MonarchLexer(languageId, regexLib) { value -> this[value] }
+    val lexer = MonarchLexer(languageId, regexLib, this.attrMap)
 
     lexer.includeLF = includeLF ?: false
     lexer.noThrow = false // raise exceptions during compilation
@@ -395,7 +395,7 @@ fun IMonarchLanguage.compile(languageId: String, regexLib: RegexLib = GlobalRege
         ?: throw lexer.createError("a language definition must define the 'tokenizer' attribute as an object")
 
 
-    val lexerMin = MonarchLexer(languageId, regexLib) { value -> this[value] }
+    val lexerMin = MonarchLexer(languageId, regexLib, this.attrMap)
 
     lexerMin.includeLF = lexer.includeLF
     lexerMin.ignoreCase = lexer.ignoreCase

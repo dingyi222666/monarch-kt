@@ -44,7 +44,7 @@ interface IMonarchLexer : IMonarchLexerMin {
 class MonarchLexer(
     override val languageId: String,
     override val regexLib: RegexLib,
-    private val attrGet: (attr: String) -> Any?
+    private val attrMap: Map<String,Any>
 ) : IMonarchLexer {
     override var maxStack: Int = 0
 
@@ -66,10 +66,10 @@ class MonarchLexer(
     override var defaultToken: String = ""
     override var stateNames: Map<String, Any> = mapOf()
 
-    override fun get(attr: String): Any? = attrGet(attr)
+    override fun get(attr: String): Any? = attrMap[attr]
 
     override fun toString(): String {
-        return "MonarchLexer(languageId='$languageId', attrGet=$attrGet, maxStack=$maxStack, start=$start, tokenPostfix='$tokenPostfix', tokenizer=$tokenizer, brackets=$brackets, ignoreCase=$ignoreCase, unicode=$unicode, includeLF=$includeLF, noThrow=$noThrow, usesEmbedded=$usesEmbedded, defaultToken='$defaultToken', stateNames=$stateNames)"
+        return "MonarchLexer(languageId='$languageId', attrMap=$attrMap, maxStack=$maxStack, start=$start, tokenPostfix='$tokenPostfix', tokenizer=$tokenizer, brackets=$brackets, ignoreCase=$ignoreCase, unicode=$unicode, includeLF=$includeLF, noThrow=$noThrow, usesEmbedded=$usesEmbedded, defaultToken='$defaultToken', stateNames=$stateNames)"
     }
 
 }
