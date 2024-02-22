@@ -23,7 +23,7 @@
 package io.github.dingyi222666.monarch.types
 
 
-internal class MonarchLanguage : IMonarchLanguage {
+class MonarchLanguage : IMonarchLanguage {
     override var tokenizer: Map<String, List<MonarchLanguageRule>>? = null
     override var ignoreCase: Boolean? = null
     override var unicode: Boolean? = null

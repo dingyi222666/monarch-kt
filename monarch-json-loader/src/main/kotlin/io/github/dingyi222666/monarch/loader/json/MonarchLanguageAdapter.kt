@@ -20,12 +20,11 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.monarch.loader
+package io.github.dingyi222666.monarch.loader.json
 
 import com.squareup.moshi.*
 import io.github.dingyi222666.monarch.types.IMonarchLanguage
 import io.github.dingyi222666.monarch.types.MonarchLanguage
-import io.github.dingyi222666.monarch.types.MonarchLanguageBracket
 
 @OptIn(ExperimentalStdlibApi::class)
 class MonarchLanguageAdapter : JsonAdapter<IMonarchLanguage>() {

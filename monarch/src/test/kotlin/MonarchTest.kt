@@ -1,15 +1,10 @@
 import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
+import io.github.dingyi222666.monarch.loader.dsl.*
 import io.github.dingyi222666.monarch.tokenization.MonarchTokenizer
-import io.github.dingyi222666.monarch.types.IMonarchLanguage
 import io.github.dingyi222666.monarch.types.Token
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.time.measureTime
-import kotlin.time.measureTimedValue
 
 /*
  * monarch-kt - Kotlin port of Monarch library.

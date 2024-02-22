@@ -20,7 +20,7 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.monarch.loader
+package io.github.dingyi222666.monarch.loader.json
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
@@ -252,18 +252,20 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
             is MonarchLanguageAction.ExpandedLanguageAction -> {
                 writer.beginObject()
 
-                if (action.group != null) {
+                val group = action.group
+                if (group != null) {
                     writer.name("group")
                     writer.beginArray()
-                    for (sub in action.group) {
+                    for (sub in group) {
                         writeAction(writer, sub)
                     }
                 }
 
-                if (action.cases != null) {
+                val cases = action.cases
+                if (cases != null) {
                     writer.name("cases")
                     writer.beginObject()
-                    for ((guard, action) in action.cases) {
+                    for ((guard, action) in cases) {
                         writer.name(guard)
                         writeAction(writer, action)
                     }

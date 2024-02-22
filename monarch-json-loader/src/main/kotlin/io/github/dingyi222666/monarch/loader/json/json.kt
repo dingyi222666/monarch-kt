@@ -20,7 +20,7 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.monarch.loader
+package io.github.dingyi222666.monarch.loader.json
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -41,4 +41,8 @@ inline fun <reified T> Moshi.Builder.add(adapter: JsonAdapter<T>): Moshi.Builder
 
 fun loadMonarchJson(json: String): IMonarchLanguage? {
     return MoshiRoot.adapter(IMonarchLanguage::class.java).fromJson(json)
+}
+
+fun IMonarchLanguage.toMonarchJson(): String {
+    return MoshiRoot.adapter(IMonarchLanguage::class.java).toJson(this)
 }

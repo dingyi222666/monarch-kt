@@ -20,7 +20,7 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.monarch.common
+package io.github.dingyi222666.monarch.loader.dsl
 
 
 import io.github.dingyi222666.monarch.extension.splitSpaceToList

@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/monarch" />
+            <option value="$PROJECT_DIR$/monarch-json-loader" />
           </set>
         </option>
       </GradleProjectSettings>

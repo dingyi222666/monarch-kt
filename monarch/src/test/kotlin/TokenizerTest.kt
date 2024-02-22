@@ -16,11 +16,9 @@
  * limitations under the License.
  */
 
-import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
-import io.github.dingyi222666.monarch.loader.loadMonarchJson
-import io.github.dingyi222666.monarch.loader.toKotlinDSL
-import io.github.dingyi222666.monarch.loader.toMonarchJson
+import io.github.dingyi222666.monarch.loader.dsl.*
+import io.github.dingyi222666.monarch.loader.dsl.toKotlinDSL
 import kotlin.test.Test
 
 

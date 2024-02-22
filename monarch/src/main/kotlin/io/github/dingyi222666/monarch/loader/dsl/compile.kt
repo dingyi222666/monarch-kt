@@ -20,13 +20,11 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.monarch.loader
+package io.github.dingyi222666.monarch.loader.dsl
 
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.Import
 import com.squareup.kotlinpoet.PropertySpec
-import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.types.IMonarchLanguage
 import io.github.dingyi222666.monarch.types.MonarchLanguageAction
 import io.github.dingyi222666.monarch.types.MonarchLanguageBracket
@@ -34,9 +32,6 @@ import io.github.dingyi222666.monarch.types.MonarchLanguageRule
 import java.util.*
 
 
-fun IMonarchLanguage.toMonarchJson(): String {
-    return MoshiRoot.adapter(IMonarchLanguage::class.java).toJson(this)
-}
 
 /**
  * Compile to Kotlin DSL

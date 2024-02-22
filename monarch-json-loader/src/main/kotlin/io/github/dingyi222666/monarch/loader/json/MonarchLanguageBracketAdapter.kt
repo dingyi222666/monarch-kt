@@ -20,7 +20,7 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.monarch.loader
+package io.github.dingyi222666.monarch.loader.json
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
