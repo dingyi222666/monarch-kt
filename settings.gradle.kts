@@ -42,3 +42,4 @@ rootProject.name = "monarch-kt"
 
 include("monarch")
 include("monarch-json-loader")
+include("regex-lib")

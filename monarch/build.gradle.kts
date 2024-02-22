@@ -21,7 +21,7 @@ plugins {
     kotlin("jvm")
 }
 
-group = "io.github.dingyi222666.kotlin"
+group = "io.github.dingyi222666.kotlin.monarch"
 version = "1.0-SNAPSHOT"
 
 repositories {

@@ -2,9 +2,9 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
-import io.github.dingyi222666.monarch.loader.dsl.toMonarchJson
 import io.github.dingyi222666.monarch.loader.json.MoshiRoot
 import io.github.dingyi222666.monarch.loader.json.loadMonarchJson
+import io.github.dingyi222666.monarch.loader.json.toMonarchJson
 import java.io.File
 import kotlin.test.assertEquals
 

@@ -3,8 +3,8 @@ plugins {
     id("com.google.devtools.ksp").version("1.9.0-1.0.13")
 }
 
-group = "io.github.dingyi222666.kotlin"
-version = "unspecified"
+group = "io.github.dingyi222666.kotlin.monarch"
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
