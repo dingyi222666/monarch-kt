@@ -34,7 +34,7 @@ package io.github.dingyi222666.monarch.types
 sealed interface MonarchLanguageRule {
     data class ShortRule1(
         override val regex: Any,
-        override val action: MonarchLanguageAction
+        override val action: MonarchLanguageAction?
     ) : MonarchLanguageRule, ShortRule
 
     data class ShortRule2(
@@ -50,7 +50,7 @@ sealed interface MonarchLanguageRule {
 
     interface ShortRule {
         val regex: Any
-        val action: MonarchLanguageAction
+        val action: MonarchLanguageAction?
     }
 }
 

@@ -1,0 +1,195 @@
+{
+  "defaultToken": "",
+  "tokenPostfix": ".bicep",
+  "brackets": [
+    [
+      "{",
+      "}",
+      "delimiter.curly"
+    ],
+    [
+      "[",
+      "]",
+      "delimiter.square"
+    ],
+    [
+      "(",
+      ")",
+      "delimiter.parenthesis"
+    ]
+  ],
+  "symbols": "[=><!~?:&|+\\-*/^%]+",
+  "keywords": [
+    "targetScope",
+    "resource",
+    "module",
+    "param",
+    "var",
+    "output",
+    "for",
+    "in",
+    "if",
+    "existing"
+  ],
+  "namedLiterals": [
+    "true",
+    "false",
+    "null"
+  ],
+  "escapes": "\\\\(u{[0-9A-Fa-f]+}|n|r|t|\\\\|'|\\${)",
+  "tokenizer": {
+    "root": [
+      {
+        "include": "@expression"
+      },
+      {
+        "include": "@whitespace"
+      }
+    ],
+    "stringVerbatim": [
+      [
+        "(|'|'')[^']",
+        {
+          "token": "string"
+        }
+      ],
+      [
+        "'''",
+        {
+          "token": "string.quote",
+          "next": "@pop"
+        }
+      ]
+    ],
+    "stringLiteral": [
+      [
+        "\\${",
+        {
+          "token": "delimiter.bracket",
+          "next": "@bracketCounting"
+        }
+      ],
+      [
+        "[^\\'$]+",
+        {
+          "token": "string"
+        }
+      ],
+      [
+        "@escapes",
+        {
+          "token": "string.escape"
+        }
+      ],
+      [
+        "\\.",
+        {
+          "token": "string.escape.invalid"
+        }
+      ],
+      [
+        "'",
+        {
+          "token": "string",
+          "next": "@pop"
+        }
+      ]
+    ],
+    "bracketCounting": [
+      [
+        "{",
+        {
+          "token": "delimiter.bracket",
+          "next": "@bracketCounting"
+        }
+      ],
+      [
+        "}",
+        {
+          "token": "delimiter.bracket",
+          "next": "@pop"
+        }
+      ],
+      {
+        "include": "expression"
+      }
+    ],
+    "comment": [
+      [
+        "[^\\*]+",
+        {
+          "token": "comment"
+        }
+      ],
+      [
+        "\\*\\/",
+        {
+          "token": "comment",
+          "next": "@pop"
+        }
+      ],
+      [
+        "[\\/*]",
+        {
+          "token": "comment"
+        }
+      ]
+    ],
+    "whitespace": [
+      [
+        "[ \\t\\r\\n]"
+      ],
+      [
+        "\\/\\*",
+        {
+          "token": "comment",
+          "next": "@comment"
+        }
+      ],
+      [
+        "\\/\\/.*$",
+        {
+          "token": "comment"
+        }
+      ]
+    ],
+    "expression": [
+      [
+        "'''",
+        {
+          "token": "string.quote",
+          "next": "@stringVerbatim"
+        }
+      ],
+      [
+        "'",
+        {
+          "token": "string.quote",
+          "next": "@stringLiteral"
+        }
+      ],
+      [
+        "[0-9]+",
+        {
+          "token": "number"
+        }
+      ],
+      [
+        "\\b[_a-zA-Z][_a-zA-Z0-9]*\\b",
+        {
+          "cases": {
+            "@keywords": {
+              "token": "keyword"
+            },
+            "@namedLiterals": {
+              "token": "keyword"
+            },
+            "@default": {
+              "token": "identifier"
+            }
+          }
+        }
+      ]
+    ]
+  }
+}

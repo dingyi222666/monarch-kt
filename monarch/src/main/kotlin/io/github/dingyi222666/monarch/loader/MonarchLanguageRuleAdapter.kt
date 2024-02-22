@@ -84,7 +84,10 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
     private fun parseArrayRule(reader: JsonReader): MonarchLanguageRule {
         reader.beginArray()
         // regex
+        // fuck escape
         val regex = reader.nextString()
+            .withEscapes()
+
 
         // action can be a string or an object, ...
 
@@ -115,7 +118,7 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
 
         while (reader.peek() != JsonReader.Token.END_OBJECT) {
             when (val nextName = reader.nextName()) {
-                "regex" -> regex = reader.nextString()
+                "regex" -> regex = reader.nextString().withEscapes()
                 "action" -> action = parseAction(reader)
                 "include" -> include = reader.nextString()
                 else -> throw JsonDataException("Unexpected name: $nextName in ${reader.path}")
@@ -128,8 +131,8 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
             return MonarchLanguageRule.ExpandedLanguageRule(include)
         }
 
-        if (regex == null || action == null) {
-            throw JsonDataException("Missing regex or action in ${reader.path}")
+        if (regex == null) {
+            throw JsonDataException("Missing regex in ${reader.path}")
         }
 
         return MonarchLanguageRule.ShortRule1(regex, action)
@@ -320,15 +323,17 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
             is MonarchLanguageRule.ShortRule1 -> {
                 writer.beginArray()
                 val regex = rule.regex
-                writer.value(if (regex is String) regex else (rule.regex as Regex).pattern)
-                writeAction(writer, rule.action)
+                val regexString = if (regex is String) regex.withoutEscapes() else (rule.regex as Regex).pattern
+                writer.value(regexString)
+                rule.action?.let { writeAction(writer, it) }
                 writer.endArray()
             }
 
             is MonarchLanguageRule.ShortRule2 -> {
                 writer.beginArray()
                 val regex = rule.regex
-                writer.value(if (regex is String) regex else (rule.regex as Regex).pattern)
+                val regexString = if (regex is String) regex.withoutEscapes() else (rule.regex as Regex).pattern
+                writer.value(regexString)
                 writeAction(writer, rule.action)
                 writer.value(rule.nextState)
                 writer.endArray()
@@ -358,4 +363,12 @@ class MonarchLanguageRuleAdapter : JsonAdapter<Map<String, List<MonarchLanguageR
 
         writer.endObject()
     }
+}
+
+fun String.withEscapes(): String {
+    return replace("\\", "\\\\")
+}
+
+fun String.withoutEscapes(): String {
+    return replace("\\\\", "\\")
 }

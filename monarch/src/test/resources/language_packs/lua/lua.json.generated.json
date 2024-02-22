@@ -1,6 +1,23 @@
 {
   "defaultToken": "",
   "tokenPostfix": ".lua",
+  "brackets": [
+    [
+      "{",
+      "}",
+      "delimiter.bracket"
+    ],
+    [
+      "[",
+      "]",
+      "delimiter.array"
+    ],
+    [
+      "(",
+      ")",
+      "delimiter.parenthesis"
+    ]
+  ],
   "keywords": [
     "and",
     "break",
@@ -24,23 +41,6 @@
     "true",
     "until",
     "while"
-  ],
-  "brackets": [
-    {
-      "token": "delimiter.bracket",
-      "open": "{",
-      "close": "}"
-    },
-    {
-      "token": "delimiter.array",
-      "open": "[",
-      "close": "]"
-    },
-    {
-      "token": "delimiter.parenthesis",
-      "open": "(",
-      "close": ")"
-    }
   ],
   "operators": [
     "+",
@@ -132,11 +132,11 @@
         "delimiter"
       ],
       [
-        "\"([^\"\\\\]|\\\\.)*$",
+        "\"([^\"\\]|\\.)*$",
         "string.invalid"
       ],
       [
-        "'([^'\\\\]|\\\\.)*$",
+        "'([^'\\]|\\.)*$",
         "string.invalid"
       ],
       [
@@ -189,7 +189,7 @@
     ],
     "string": [
       [
-        "[^\\\\\"']+",
+        "[^\\\"']+",
         "string"
       ],
       [
@@ -197,7 +197,7 @@
         "string.escape"
       ],
       [
-        "\\\\.",
+        "\\.",
         "string.escape.invalid"
       ],
       [

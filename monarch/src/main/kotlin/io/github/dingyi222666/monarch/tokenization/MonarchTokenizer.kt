@@ -517,9 +517,15 @@ class MonarchTokenizer(
         tokensCollector: IMonarchTokensCollector,
         stack: MonarchStackElement
     ): MonarchLineState {
-        val languageId = embeddedLanguages[enteringEmbeddedLanguage] ?: enteringEmbeddedLanguage
+        var languageId = embeddedLanguages[enteringEmbeddedLanguage] ?: enteringEmbeddedLanguage
 
-        val embeddedLanguageData = this.getNestedEmbeddedLanguageData(languageId)
+        var embeddedLanguageData = getNestedEmbeddedLanguageData(languageId)
+
+        if (embeddedLanguageData.state === NullState && languageId.contains("/")) {
+            languageId = languageId.substringAfterLast("/")
+            embeddedLanguageData = getNestedEmbeddedLanguageData(languageId)
+            println(languageId)
+        }
 
         if (pos < lineLength) {
             // there is content from the embedded language on this line

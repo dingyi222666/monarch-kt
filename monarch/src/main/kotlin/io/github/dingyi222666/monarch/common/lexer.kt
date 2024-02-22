@@ -452,7 +452,7 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
                 val copyOfAction = action.copy(next = rule.nextState)
                 newRule.setAction(lexerMin, copyOfAction)
             } else {
-                newRule.setAction(lexerMin, action)
+                action?.let { newRule.setAction(lexerMin, it) }
             }
 
             newRule.setRegex(lexerMin, rule.regex)

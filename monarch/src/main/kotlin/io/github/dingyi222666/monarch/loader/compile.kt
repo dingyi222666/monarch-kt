@@ -259,6 +259,8 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                     compileMonarchExpandedLanguageActionToKotlinDSL(action, codeBlock)
                     codeBlock.endControlFlow()
                 }
+
+                else -> {}
             }
 
         }

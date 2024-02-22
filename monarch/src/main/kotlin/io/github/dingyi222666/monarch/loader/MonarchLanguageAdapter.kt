@@ -46,6 +46,7 @@ class MonarchLanguageAdapter : JsonAdapter<IMonarchLanguage>() {
                 "unicode" -> language.unicode = reader.nextBoolean()
                 "ignoreCase" -> language.ignoreCase = reader.nextBoolean()
                 "start" -> language.start = reader.nextString()
+                "tokenPostfix" -> language.tokenPostfix = reader.nextString()
                 "brackets" -> {
                     language.brackets = bracketAdapter.fromJson(reader)
                 }
@@ -92,6 +93,11 @@ class MonarchLanguageAdapter : JsonAdapter<IMonarchLanguage>() {
         if (value.defaultToken != null) {
             writer.name("defaultToken")
             writer.value(value.defaultToken)
+        }
+
+        if (value.tokenPostfix != null) {
+            writer.name("tokenPostfix")
+            writer.value(value.tokenPostfix)
         }
 
         if (value.brackets != null && value.brackets?.isNotEmpty() == true) {

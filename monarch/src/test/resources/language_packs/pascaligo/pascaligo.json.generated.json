@@ -1,0 +1,210 @@
+{
+  "defaultToken": "",
+  "tokenPostfix": ".pascaligo",
+  "brackets": [
+    [
+      "{",
+      "}",
+      "delimiter.curly"
+    ],
+    [
+      "[",
+      "]",
+      "delimiter.square"
+    ],
+    [
+      "(",
+      ")",
+      "delimiter.parenthesis"
+    ],
+    [
+      "<",
+      ">",
+      "delimiter.angle"
+    ]
+  ],
+  "ignoreCase": true,
+  "keywords": [
+    "begin",
+    "block",
+    "case",
+    "const",
+    "else",
+    "end",
+    "fail",
+    "for",
+    "from",
+    "function",
+    "if",
+    "is",
+    "nil",
+    "of",
+    "remove",
+    "return",
+    "skip",
+    "then",
+    "type",
+    "var",
+    "while",
+    "with",
+    "option",
+    "None",
+    "transaction"
+  ],
+  "typeKeywords": [
+    "bool",
+    "int",
+    "list",
+    "map",
+    "nat",
+    "record",
+    "string",
+    "unit",
+    "address",
+    "map",
+    "mtz",
+    "xtz"
+  ],
+  "operators": [
+    "=",
+    ">",
+    "<",
+    "<=",
+    ">=",
+    "<>",
+    ":",
+    ":=",
+    "and",
+    "mod",
+    "or",
+    "+",
+    "-",
+    "*",
+    "/",
+    "@",
+    "&",
+    "^",
+    "%"
+  ],
+  "symbols": "[=><:@\\^&|+\\-*\\/\\^%]+",
+  "tokenizer": {
+    "root": [
+      [
+        "[a-zA-Z_][\\w]*",
+        {
+          "cases": {
+            "@keywords": {
+              "token": "keyword.$0"
+            },
+            "@default": "identifier"
+          }
+        }
+      ],
+      {
+        "include": "@whitespace"
+      },
+      [
+        "[{}()\\[\\]]",
+        "@brackets"
+      ],
+      [
+        "[<>](?!@symbols)",
+        "@brackets"
+      ],
+      [
+        "@symbols",
+        {
+          "cases": {
+            "@operators": "delimiter",
+            "@default": ""
+          }
+        }
+      ],
+      [
+        "\\d*\\.\\d+([eE][\\-+]?\\d+)?",
+        "number.float"
+      ],
+      [
+        "\\$[0-9a-fA-F]{1,16}",
+        "number.hex"
+      ],
+      [
+        "\\d+",
+        "number"
+      ],
+      [
+        "[;,.]",
+        "delimiter"
+      ],
+      [
+        "'([^'\\]|\\.)*$",
+        "string.invalid"
+      ],
+      [
+        "'",
+        "string",
+        "@string"
+      ],
+      [
+        "'[^\\']'",
+        "string"
+      ],
+      [
+        "'",
+        "string.invalid"
+      ],
+      [
+        "\\#\\d+",
+        "string"
+      ]
+    ],
+    "comment": [
+      [
+        "[^\\(\\*]+",
+        "comment"
+      ],
+      [
+        "\\*\\)",
+        "comment",
+        "@pop"
+      ],
+      [
+        "\\(\\*",
+        "comment"
+      ]
+    ],
+    "string": [
+      [
+        "[^\\']+",
+        "string"
+      ],
+      [
+        "\\.",
+        "string.escape.invalid"
+      ],
+      [
+        "'",
+        {
+          "token": "string.quote",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "whitespace": [
+      [
+        "[ \\t\\r\\n]+",
+        "white"
+      ],
+      [
+        "\\(\\*",
+        "comment",
+        "@comment"
+      ],
+      [
+        "\\/\\/.*$",
+        "comment"
+      ]
+    ]
+  }
+}

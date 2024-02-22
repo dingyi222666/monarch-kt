@@ -49,12 +49,7 @@ class TokenizerTest {
         println(dsl)
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
-    @Test
-    fun parseJsonGrammar() {
-        val text = this::class.java.getResource("lua.json").readText()
-        println(loadMonarchJson(text))
-    }
+
 
     val code = "// Type source code in your language here...\n" +
             "class MyClass {\n" +

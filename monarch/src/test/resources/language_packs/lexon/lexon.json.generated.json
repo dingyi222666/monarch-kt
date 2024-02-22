@@ -1,0 +1,225 @@
+{
+  "tokenPostfix": ".lexon",
+  "ignoreCase": true,
+  "keywords": [
+    "lexon",
+    "lex",
+    "clause",
+    "terms",
+    "contracts",
+    "may",
+    "pay",
+    "pays",
+    "appoints",
+    "into",
+    "to"
+  ],
+  "typeKeywords": [
+    "amount",
+    "person",
+    "key",
+    "time",
+    "date",
+    "asset",
+    "text"
+  ],
+  "operators": [
+    "less",
+    "greater",
+    "equal",
+    "le",
+    "gt",
+    "or",
+    "and",
+    "add",
+    "added",
+    "subtract",
+    "subtracted",
+    "multiply",
+    "multiplied",
+    "times",
+    "divide",
+    "divided",
+    "is",
+    "be",
+    "certified"
+  ],
+  "symbols": "[=><!~?:&|+\\-*\\/\\^%]+",
+  "tokenizer": {
+    "root": [
+      [
+        "^(\\s*)(comment:?(?:\\s.*|))$",
+        [
+          "",
+          "comment"
+        ]
+      ],
+      [
+        "\"",
+        {
+          "token": "identifier.quote",
+          "next": "@quoted_identifier",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "LEX$",
+        {
+          "token": "keyword",
+          "next": "@identifier_until_period",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "LEXON",
+        {
+          "token": "keyword",
+          "next": "@semver",
+          "bracket": "@open"
+        }
+      ],
+      [
+        ":",
+        {
+          "token": "delimiter",
+          "next": "@identifier_until_period",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "[a-z_$][\\w$]*",
+        {
+          "cases": {
+            "@operators": "operator",
+            "@typeKeywords": "keyword.type",
+            "@keywords": "keyword",
+            "@default": "identifier"
+          }
+        }
+      ],
+      {
+        "include": "@whitespace"
+      },
+      [
+        "[{}()\\[\\]]",
+        "@brackets"
+      ],
+      [
+        "[<>](?!@symbols)",
+        "@brackets"
+      ],
+      [
+        "@symbols",
+        "delimiter"
+      ],
+      [
+        "\\d*\\.\\d*\\.\\d*",
+        "number.semver"
+      ],
+      [
+        "\\d*\\.\\d+([eE][\\-+]?\\d+)?",
+        "number.float"
+      ],
+      [
+        "0[xX][0-9a-fA-F]+",
+        "number.hex"
+      ],
+      [
+        "\\d+",
+        "number"
+      ],
+      [
+        "[;,.]",
+        "delimiter"
+      ]
+    ],
+    "quoted_identifier": [
+      [
+        "[^\\\"]+",
+        "identifier"
+      ],
+      [
+        "\"",
+        {
+          "token": "identifier.quote",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "space_identifier_until_period": [
+      [
+        ":",
+        "delimiter"
+      ],
+      [
+        " ",
+        {
+          "token": "white",
+          "next": "@identifier_rest"
+        }
+      ]
+    ],
+    "identifier_until_period": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        ":",
+        {
+          "token": "delimiter",
+          "next": "@identifier_rest"
+        }
+      ],
+      [
+        "[^\\.]+",
+        "identifier"
+      ],
+      [
+        "\\.",
+        {
+          "token": "delimiter",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "identifier_rest": [
+      [
+        "[^\\.]+",
+        "identifier"
+      ],
+      [
+        "\\.",
+        {
+          "token": "delimiter",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "semver": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        ":",
+        "delimiter"
+      ],
+      [
+        "\\d*\\.\\d*\\.\\d*",
+        {
+          "token": "number.semver",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "whitespace": [
+      [
+        "[ \\t\\r\\n]+",
+        "white"
+      ]
+    ]
+  }
+}
