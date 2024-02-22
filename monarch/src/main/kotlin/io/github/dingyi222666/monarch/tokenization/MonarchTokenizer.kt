@@ -237,7 +237,7 @@ class MonarchTokenizer(
                         val currentMatches = rule.regex.search(restOfLine)?.groupValues
                         if (currentMatches != null) {
                             matches = currentMatches
-                            matched = matches[0]
+                            matched = currentMatches[0]
                             action = rule.action
                             break
                         }

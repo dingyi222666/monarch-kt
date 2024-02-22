@@ -23,10 +23,12 @@
 package io.github.dingyi222666.monarch.loader.dsl
 
 
+import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
 import io.github.dingyi222666.monarch.extension.splitSpaceToList
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.types.*
 import io.github.dingyi222666.monarch.types.MonarchLanguage
+import io.github.dingyi222666.kotlin.regex.Regex
 
 @DslMarker
 annotation class MonarchDSL
@@ -487,7 +489,7 @@ infix fun String.and(regex: Regex) {
 context(MonarchLanguageScope)
 @MonarchDSL
 val String.r: Regex
-    get() = this.toRegex()
+    get() = GlobalRegexLib.compile(this)
 
 context(MonarchLanguageScope)
 @MonarchDSL

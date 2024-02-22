@@ -45,9 +45,9 @@ abstract class Regex {
 
     abstract fun containsMatchIn(input: CharSequence): Boolean
 
-    abstract fun search(input: CharSequence, startPosition: Int, cached: Boolean = true): MatchResult?
+    abstract fun search(input: CharSequence, startPosition: Int, cached: Boolean = false): MatchResult?
 
-    fun search(input: CharSequence, cached: Boolean = true) = search(input, 0, cached)
+    fun search(input: CharSequence, cached: Boolean = false) = search(input, 0, cached)
 
     abstract fun replace(source: String, transform: (result: MatchGroup) -> String): String
 

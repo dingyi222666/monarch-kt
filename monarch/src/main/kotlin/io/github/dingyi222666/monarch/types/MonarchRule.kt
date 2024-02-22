@@ -31,6 +31,7 @@ import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
 import io.github.dingyi222666.monarch.common.compileAction
 import io.github.dingyi222666.monarch.common.compileRegExp
 import io.github.dingyi222666.monarch.extension.*
+import io.github.dingyi222666.kotlin.regex.Regex
 
 /**
  * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L70)
@@ -56,7 +57,7 @@ class MonarchRule(
     fun setRegex(lexer: IMonarchLexerMin, regexArg: Any) {
         val currentRegex = when(regexArg) {
             is String -> regexArg
-            is io.github.dingyi222666.kotlin.regex.Regex -> regexArg.pattern
+            is Regex -> regexArg.pattern
             else -> throw lexer.createError("rules must start with a match string or regular expression: ${this.name}")
         }
 

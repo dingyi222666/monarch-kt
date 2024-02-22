@@ -12,7 +12,7 @@ We not only ported the core code of monarch, but also supported the following ad
 
 - Load monarch grammar from JSON or convert monarch grammar to JSON.
 - Define Monarch grammar using Kotlin DSL and also be able to convert to Kotlin DSL (this allows us to convert from JSON to Kotlin DSL, avoiding the overhead of parsing JSON)
-- Custom regular expression library, currently only supports the regular expression implementation in the Kotlin standard library. (We may extend other regular expression support in the future.)
+- Custom regular expression library, supports the regular expression implementation in the Kotlin standard library, [re2j](https://github.com/google/re2j), [joni](https://github.com/jruby/joni)
 
 ## Features
 

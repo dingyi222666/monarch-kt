@@ -43,15 +43,15 @@ fun runTests(language: String) {
 
     val tokenizer = languageRegistry.getTokenizer(languageId) ?: throw Exception("Language $language not found")
 
-    for ((index,test1) in tests.withIndex()) {
+    for ((index, test1) in tests.withIndex()) {
         var state = tokenizer.getInitialState();
 
-        for ((subIndex,subTest) in test1.withIndex()) {
+        for ((subIndex, subTest) in test1.withIndex()) {
             val result = tokenizer.tokenize(subTest.line, true, state)
             state = result.endState;
             assertEquals(subTest.tokens, result.tokens.map {
                 Token(it.offset, it.type)
-            },"The tokens are not equal in line root[$index][$subIndex]: ${subTest.line}")
+            }, "The tokens are not equal in line root[$index][$subIndex]: ${subTest.line}")
         }
     }
 }
@@ -90,13 +90,17 @@ private fun registerLanguage(
             tokenPostfix.substring(tokenPostfix.indexOf("."))
         } else language
 
+    val baseEmbeddingLanguages = mapOf(
+        "text/javascript" to "js",
+        "javascript" to "js"
+    )
 
     languageRegistry.registerLanguage(
         Language(
             languageName = languageName,
             monarchLanguage,
             languageId = languageName,
-            embeddedLanguages = willRegisteredLanguages.associateWith { it }
+            embeddedLanguages = willRegisteredLanguages.associateWith { it } + baseEmbeddingLanguages
         )
     )
 

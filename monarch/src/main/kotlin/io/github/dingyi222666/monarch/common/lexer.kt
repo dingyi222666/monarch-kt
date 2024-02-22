@@ -190,8 +190,8 @@ fun IMonarchLexerMin.createGuard(ruleName: String, tkey: String, value: MonarchF
     }
 
     // return the branch object
-    if (scrut == -1) {
-        return MonarchBranch(
+    return if (scrut == -1) {
+        MonarchBranch(
             name = tkey,
             value = value,
             test = { id, matches, state, eos ->
@@ -199,7 +199,7 @@ fun IMonarchLexerMin.createGuard(ruleName: String, tkey: String, value: MonarchF
             }
         )
     } else {
-        return MonarchBranch(
+        MonarchBranch(
             name = tkey,
             value = value,
             test = { id, matches, state, eos ->
@@ -294,8 +294,8 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
         return MonarchFuzzyAction.ActionBase(
             test = { id, matches, state, eos ->
                 for (caseValue in cases) {
-                    val didMatch = caseValue.test?.invoke(id, matches, state, eos)
-                    if (didMatch == true) {
+                    val didMatch = caseValue.test == null || caseValue.test.invoke(id, matches, state, eos)
+                    if (didMatch) {
                         return@ActionBase caseValue.value
                     }
                 }
@@ -455,6 +455,7 @@ fun IMonarchLanguage.compile(languageId: String, regexLib: RegexLib = GlobalRege
                     newrule.setAction(lexerMin, rule1);
                 }*/
                 val copyOfAction = action.copy(next = rule.nextState)
+                println(rule.nextState)
                 newRule.setAction(lexerMin, copyOfAction)
             } else {
                 action?.let { newRule.setAction(lexerMin, it) }
@@ -496,23 +497,20 @@ fun IMonarchLanguage.compile(languageId: String, regexLib: RegexLib = GlobalRege
             throw lexer.createError("open and close brackets in a 'brackets' attribute must be different: ${bracket.open} \n hint: use the 'bracket' attribute if matching on equal brackets is required.")
         }
 
-        if (lexer.ignoreCase) {
-            newBrackets.add(
-                MonarchLanguageBracket(
-                    lexer.fixCase(bracket.open),
-                    lexer.fixCase(bracket.close),
-                    bracket.token,
-                )
+
+        newBrackets.add(
+            MonarchLanguageBracket(
+                lexer.fixCase(bracket.open),
+                lexer.fixCase(bracket.close),
+                bracket.token + lexer.tokenPostfix,
             )
-        }
+        )
+
 
     }
 
-    if (lexer.ignoreCase) {
-        lexer.brackets = newBrackets
-    } else {
-        lexer.brackets = brackets
-    }
+
+    lexer.brackets = newBrackets
 
     // Disable throw so the syntax highlighter goes, no matter what
     lexer.noThrow = true

@@ -12,13 +12,13 @@ repositories {
 
 dependencies {
     implementation(project(":monarch"))
-    implementation(project(":regex-lib-re2j"))
-    implementation(project(":regex-lib-oniguruma"))
+
     ksp("com.squareup.moshi:moshi-kotlin-codegen:1.15.1")
     implementation("com.squareup.moshi:moshi:1.15.1")
 
     testImplementation(kotlin("test"))
-    testImplementation(kotlin("test"))
+    testImplementation(project(":regex-lib-re2j"))
+    testImplementation(project(":regex-lib-oniguruma"))
 }
 
 tasks.test {

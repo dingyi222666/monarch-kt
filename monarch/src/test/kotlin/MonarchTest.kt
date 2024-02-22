@@ -1,4 +1,5 @@
 import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
+import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
 import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.dsl.*
@@ -38,6 +39,7 @@ class MonarchTest {
     // Ensure @rematch and nextEmbedded can be used together in Monarch grammar
     @Test
     fun testGrammar1() {
+        applyOnigRegexLibToGlobal()
         val languageRegistry = LanguageRegistry()
 
         buildLanguage("sql") {
@@ -150,6 +152,7 @@ class MonarchTest {
     // microsoft/monaco-editor#1235: Empty Line Handling
     @Test
     fun testGrammar2() {
+        applyOnigRegexLibToGlobal()
         val languageRegistry = LanguageRegistry()
 
         val tokenizer = buildLanguage("test") {
@@ -183,8 +186,8 @@ class MonarchTest {
                 "comment_cpp" rules {
                     // in javascript: (?:[^\\]|(?:\\.))+$
                     // why we need six backslashes?
-                    Regex("""(?:[^\\\\\\]|(?:\\\\\\.))+$""") action "comment" state "@pop"
-                    Regex(".+$") action "comment"
+                    GlobalRegexLib.compile("""(?:[^\\\\\\]|(?:\\\\\\.))+$""") action "comment" state "@pop"
+                    GlobalRegexLib.compile(".+$") token "comment"
                     "$" action "comment" state "@pop"
                     // No possible rule to detect an empty line and @pop?
                 }
@@ -238,6 +241,7 @@ class MonarchTest {
     // microsoft/monaco-editor#2265: Exit a state at end of line
     @Test
     fun testGrammar3() {
+        applyOnigRegexLibToGlobal()
         val languageRegistry = LanguageRegistry()
 
         val tokenizer = buildLanguage("test") {
@@ -298,7 +302,7 @@ class MonarchTest {
     // microsoft/vscode #115662: monarchCompile function need an extra option which can control replacement
     @Test
     fun testGrammar4() {
-
+        applyOnigRegexLibToGlobal()
         val tokenizer1 = buildMonarchLanguage {
             ignoreCase = false
             "uselessReplaceKey1" and "@uselessReplaceKey2"
@@ -364,6 +368,7 @@ class MonarchTest {
     // microsoft/monaco-editor#2424: Allow to target @@
     @Test
     fun testGrammar5() {
+        applyOnigRegexLibToGlobal()
         val languageRegistry = LanguageRegistry()
 
         val tokenizer = buildLanguage("test") {

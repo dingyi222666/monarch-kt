@@ -33,6 +33,8 @@ dependencies {
     api(project(":regex-lib"))
     testImplementation(kotlin("test"))
     testImplementation("com.squareup:kotlinpoet:1.16.0")
+    testImplementation(project(":regex-lib-re2j"))
+    testImplementation(project(":regex-lib-oniguruma"))
 }
 
 tasks.test {
