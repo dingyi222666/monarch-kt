@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,9 +73,10 @@ fun IMonarchLexerMin.substituteMatches(
             matchesList.add(0, state)
             stateMatches = matchesList
         }
+        val stateMatches = stateMatches ?: throw IllegalStateException("stateMatches is null")
         val sNumber = s.toInt()
-        if (s.isNotEmpty() && sNumber < stateMatches!!.size) {
-            return@replace fixCase(stateMatches!![sNumber]) // $Sn
+        if (s.isNotEmpty() && sNumber < stateMatches.size) {
+            return@replace fixCase(stateMatches[sNumber]) // $Sn
         }
         return@replace ""
     }

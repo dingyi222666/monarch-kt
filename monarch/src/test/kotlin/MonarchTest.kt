@@ -1,3 +1,4 @@
+import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
 import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.dsl.*
@@ -9,7 +10,7 @@ import kotlin.test.assertEquals
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -322,7 +323,7 @@ class MonarchTest {
             }
         }.let {
             val lexer = it.compile("test")
-            MonarchTokenizer("test", lexer, LanguageRegistry.instance, null, 5000)
+            MonarchTokenizer("test", lexer, LanguageRegistry.instance, null, GlobalRegexLib, 5000)
         }
 
         val tokenizer2 = buildMonarchLanguage {
@@ -334,7 +335,7 @@ class MonarchTest {
             }
         }.let {
             val lexer = it.compile("test")
-            MonarchTokenizer("test", lexer, LanguageRegistry.instance, null, 5000)
+            MonarchTokenizer("test", lexer, LanguageRegistry.instance, null, GlobalRegexLib, 5000)
         }
 
         val lines = listOf(

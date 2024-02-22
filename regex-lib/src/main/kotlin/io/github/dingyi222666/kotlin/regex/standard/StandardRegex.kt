@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Initial code from https://github.com/microsoft/vscode
- * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
- * Initial license: MIT
  */
 
 package io.github.dingyi222666.kotlin.regex.standard
@@ -36,9 +33,10 @@ class StandardRegexLib(
         return StandardRegexScanner(patterns)
     }
 
-    override fun compile(str: CharSequence): Regex {
+
+    override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): StandardRegex {
         val cached = cache.get(str)
-        return cached ?: StandardRegex(str).also { cache.put(str, it) }
+        return cached ?: StandardRegex(str, regexOption).also { cache.put(str, it) }
     }
 }
 
@@ -82,10 +80,14 @@ class StandardRegexScanner(
 }
 
 class StandardRegex(
-    pattern: CharSequence
+    pattern: CharSequence,
+    regexOption: Set<RegexOption>? = null
 ) : Regex() {
 
-    private val nativeRegex = Pattern.compile(pattern.toString())
+    override val options = regexOption ?: setOf(RegexOption.NONE)
+
+    private val nativeRegex = Pattern.compile(pattern.toString(), regexOption?.toInt() ?: 0)
+
     override val pattern: String
         get() = nativeRegex.pattern()
 
@@ -102,7 +104,7 @@ class StandardRegex(
     override fun search(input: CharSequence, startPosition: Int, cached: Boolean): MatchResult? {
         if (cached) {
             synchronized(this) {
-                val lastSearchResult0 = this.lastSearchResult;
+                val lastSearchResult0 = this.lastSearchResult
                 if (lastSearchString == input
                     && lastSearchPosition <= startPosition
                     && (lastSearchResult0 == null || lastSearchResult0.range.first >= startPosition)
@@ -112,7 +114,7 @@ class StandardRegex(
             }
         }
 
-        val result = searchInternal(input, startPosition);
+        val result = searchInternal(input, startPosition)
         synchronized(this) {
             lastSearchString = input
             lastSearchPosition = startPosition

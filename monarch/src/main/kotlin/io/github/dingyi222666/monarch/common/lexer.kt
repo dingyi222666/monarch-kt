@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@
 
 package io.github.dingyi222666.monarch.common
 
+import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
+import io.github.dingyi222666.kotlin.regex.RegexLib
+import io.github.dingyi222666.kotlin.regex.RegexOption
 import io.github.dingyi222666.monarch.extension.*
 import io.github.dingyi222666.monarch.types.*
 
@@ -33,6 +36,7 @@ import io.github.dingyi222666.monarch.types.*
 internal val regex1 = "@@".toRegex()
 internal val wordsRegex = "@(\\w+)".toRegex()
 
+
 /**
  * Compiles a regular expression string, adding the 'i' flag if 'ignoreCase' is set, and the 'u' flag if 'unicode' is set.
  * Also replaces @\w+ sequences with the content of the specified attribute. Escaping `@` signs with another `@` sign avoids replacement.
@@ -40,7 +44,8 @@ internal val wordsRegex = "@(\\w+)".toRegex()
  * @example /@attr/ will be replaced with the value of lexer.attr
  * @example /@@text/ will not be replaced and will become /@text/.
  */
-fun IMonarchLexerMin.compileRegExp(str: String): Regex {
+fun IMonarchLexerMin.compileRegExp(str: String): io.github.dingyi222666.kotlin.regex.Regex {
+
     // @@ must be interpreted as a literal @, so we replace all occurrences of @@ with a placeholder character
     var str = str.replace(regex1, "\u0001")
 
@@ -76,9 +81,9 @@ fun IMonarchLexerMin.compileRegExp(str: String): Regex {
     str = str.replace("\u0001", "@")
 
     return if (ignoreCase) {
-        str.toRegex(RegexOption.IGNORE_CASE)
+        this.regexLib.compile(str, RegexOption.IGNORE_CASE)
     } else {
-        str.toRegex()
+        this.regexLib.compile(str)
     }
 }
 
@@ -366,10 +371,10 @@ internal fun IMonarchLexerMin.compileExpandedLanguageAction(
 /**
  * Compiles a language description function into json where all regular expressions
  */
-fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
+fun IMonarchLanguage.compile(languageId: String, regexLib: RegexLib = GlobalRegexLib): IMonarchLexer {
 
     // Create our lexer
-    val lexer = MonarchLexer(languageId) { value -> this[value] }
+    val lexer = MonarchLexer(languageId, regexLib) { value -> this[value] }
 
     lexer.includeLF = includeLF ?: false
     lexer.noThrow = false // raise exceptions during compilation
@@ -390,7 +395,7 @@ fun IMonarchLanguage.compile(languageId: String): IMonarchLexer {
         ?: throw lexer.createError("a language definition must define the 'tokenizer' attribute as an object")
 
 
-    val lexerMin = MonarchLexer(languageId) { value -> this[value] }
+    val lexerMin = MonarchLexer(languageId, regexLib) { value -> this[value] }
 
     lexerMin.includeLF = lexer.includeLF
     lexerMin.ignoreCase = lexer.ignoreCase

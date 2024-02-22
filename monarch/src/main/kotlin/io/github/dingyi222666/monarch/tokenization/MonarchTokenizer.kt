@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 
 package io.github.dingyi222666.monarch.tokenization
 
+import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
+import io.github.dingyi222666.kotlin.regex.RegexLib
 import io.github.dingyi222666.monarch.extension.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.types.*
@@ -36,6 +38,7 @@ class MonarchTokenizer(
     private val lexer: IMonarchLexer,
     private val languageRegistry: LanguageRegistry = LanguageRegistry.instance,
     private val themeService: IThemeService? = null,
+    private val regexLib: RegexLib = GlobalRegexLib,
     var maxTokenizationLineLength: Int = 5000
 ) : ITokenizationSupport {
 
@@ -103,10 +106,10 @@ class MonarchTokenizer(
             var regex = rule.regex
             val regexSource = rule.regex.pattern
             if (regexSource.substring(0, 4) == "^(?:" && regexSource.last() == ')') {
-                regex = Regex(regexSource.substring(4, regexSource.length - 1), regex.options)
+                regex = GlobalRegexLib.compile(regexSource.substring(4, regexSource.length - 1), regex.options)
             }
 
-            val result = regex.find(line)?.range?.first ?: -1
+            val result = regex.search(line)?.range?.first ?: -1
 
             if (result == -1 || (result != 0 && rule.matchOnlyAtLineStart)) {
                 continue
@@ -231,7 +234,7 @@ class MonarchTokenizer(
                 val restOfLine = line.substring(pos)
                 for (rule in rules) {
                     if (pos == 0 || !rule.matchOnlyAtLineStart) {
-                        val currentMatches = rule.regex.find(restOfLine)?.groupValues
+                        val currentMatches = rule.regex.search(restOfLine)?.groupValues
                         if (currentMatches != null) {
                             matches = currentMatches
                             matched = matches[0]

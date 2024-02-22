@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,8 @@
 
 package io.github.dingyi222666.monarch.types
 
-import com.squareup.moshi.JsonClass
-
 
 // A Monarch language definition
-@JsonClass(generateAdapter = false)
 interface IMonarchLanguage {
     // map from string to ILanguageRule[]
     val tokenizer: Map<String, List<MonarchLanguageRule>>?

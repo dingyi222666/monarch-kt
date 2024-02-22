@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * Initial code from https://github.com/microsoft/vscode
- * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
- * Initial license: MIT
  */
 
 package io.github.dingyi222666.kotlin.regex
 
 import io.github.dingyi222666.kotlin.regex.standard.StandardRegexLib
+import java.util.*
+import java.util.regex.Pattern
 
 interface RegexLib {
     fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner
-    fun compile(str: CharSequence): Regex
+
+    fun compile(str: CharSequence, regexOption: Set<RegexOption>?): Regex
+
+    fun compile(str: CharSequence, vararg regexOption: RegexOption): Regex {
+        return compile(str, regexOption.toSet())
+    }
 }
 
 interface RegexScanner {
@@ -37,6 +40,7 @@ interface RegexScanner {
 }
 
 abstract class Regex {
+    abstract val options: Set<RegexOption>
     abstract val pattern: String
 
     abstract fun containsMatchIn(input: CharSequence): Boolean
@@ -48,6 +52,10 @@ abstract class Regex {
     abstract fun replace(source: String, transform: (result: MatchGroup) -> String): String
 
     fun replace(source: String, target: String) = replace(source) { target }
+
+    fun matches(input: CharSequence): Boolean {
+        return search(input, 0) != null
+    }
 
 }
 
@@ -63,6 +71,8 @@ data class MatchResult(
 ) {
     val count: Int
         get() = groups.size
+
+    val groupValues by lazy(LazyThreadSafetyMode.NONE) { groups.map { it.value } }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -122,6 +132,60 @@ object GlobalRegexLib : RegexLib {
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner =
         defaultRegexLib.createRegexScanner(patterns)
 
-    override fun compile(str: CharSequence): Regex =
-        defaultRegexLib.compile(str)
+    override fun compile(str: CharSequence, regexOption: Set<RegexOption>?) = defaultRegexLib.compile(str, regexOption)
+}
+
+internal interface FlagEnum {
+    val value: Int
+    val mask: Int
+}
+
+internal fun Iterable<FlagEnum>.toInt(): Int =
+    this.fold(0) { value, option -> value or option.value }
+
+internal inline fun <reified T> fromInt(value: Int): Set<T> where T : FlagEnum, T : Enum<T> =
+    Collections.unmodifiableSet(EnumSet.allOf(T::class.java).apply {
+        retainAll { value and it.mask == it.value }
+    })
+
+/**
+ * Provides enumeration values to use to set regular expression options.
+ */
+enum class RegexOption(override val value: Int, override val mask: Int = value) : FlagEnum {
+    // common
+
+    NONE(0),
+
+    /** Enables case-insensitive matching. Case comparison is Unicode-aware. */
+    IGNORE_CASE(Pattern.CASE_INSENSITIVE),
+
+    /** Enables multiline mode.
+     *
+     * In multiline mode the expressions `^` and `$` match just after or just before,
+     * respectively, a line terminator or the end of the input sequence. */
+    MULTILINE(Pattern.MULTILINE),
+
+    //jvm-specific
+
+    /** Enables literal parsing of the pattern.
+     *
+     * Metacharacters or escape sequences in the input sequence will be given no special meaning.
+     */
+    LITERAL(Pattern.LITERAL),
+
+    //    // Unicode case is enabled by default with the IGNORE_CASE
+//    /** Enables Unicode-aware case folding. */
+    UNICODE_CASE(Pattern.UNICODE_CASE),
+
+    /** Enables Unix lines mode. In this mode, only the `'\n'` is recognized as a line terminator. */
+    UNIX_LINES(Pattern.UNIX_LINES),
+
+    /** Permits whitespace and comments in pattern. */
+    COMMENTS(Pattern.COMMENTS),
+
+    /** Enables the mode, when the expression `.` matches any character, including a line terminator. */
+    DOT_MATCHES_ALL(Pattern.DOTALL),
+
+    /** Enables equivalence by canonical decomposition. */
+    CANON_EQ(Pattern.CANON_EQ)
 }

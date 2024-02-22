@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ repositories {
 
 dependencies {
     compileOnly("com.squareup:kotlinpoet:1.16.0")
+    implementation(project(":regex-lib"))
     testImplementation(kotlin("test"))
     testImplementation("com.squareup:kotlinpoet:1.16.0")
 }

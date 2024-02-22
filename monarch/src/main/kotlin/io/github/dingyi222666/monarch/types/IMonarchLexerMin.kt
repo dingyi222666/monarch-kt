@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
 
 package io.github.dingyi222666.monarch.types
 
+import io.github.dingyi222666.kotlin.regex.RegexLib
+
 /**
  * Minimal interface for a Monarch lexer.
  *
@@ -41,6 +43,7 @@ interface IMonarchLexerMin {
     var usesEmbedded: Boolean
     var defaultToken: String
     var stateNames: Map<String, Any>
+    val regexLib: RegexLib
 
     // Other keys that can be referred to by the tokenizer.
     @Suppress("UNUSED")

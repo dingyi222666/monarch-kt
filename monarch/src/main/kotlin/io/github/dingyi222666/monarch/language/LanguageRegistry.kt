@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 
 package io.github.dingyi222666.monarch.language
 
+import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
+import io.github.dingyi222666.kotlin.regex.RegexLib
 import io.github.dingyi222666.monarch.common.compile
 import io.github.dingyi222666.monarch.tokenization.MonarchTokenizer
 import io.github.dingyi222666.monarch.types.IThemeService
@@ -58,14 +60,18 @@ class LanguageRegistry(
         language: Language,
         compileToTokenizer: Boolean = true,
         themeService: IThemeService? = null,
+        regexLib: RegexLib = GlobalRegexLib,
         maxTokenizationLineLength: Int = 5000
     ) {
         this.languageIdToLanguages[language.languageId] = language
 
         if (compileToTokenizer) {
-            val compiledLexer = language.monarchLanguage.compile(language.languageId)
+            val compiledLexer = language.monarchLanguage.compile(language.languageId, regexLib)
             val tokenizer =
-                MonarchTokenizer(language.languageId, compiledLexer, this, themeService, maxTokenizationLineLength)
+                MonarchTokenizer(
+                    language.languageId, compiledLexer, this, themeService,
+                    compiledLexer.regexLib, maxTokenizationLineLength
+                )
             this.registerTokenizer(language.languageId, tokenizer)
         }
     }

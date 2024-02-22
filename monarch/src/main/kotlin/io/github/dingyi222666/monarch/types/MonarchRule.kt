@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024-2024  dingyi
+ * Copyright (C) 2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 
 package io.github.dingyi222666.monarch.types
 
+import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
 import io.github.dingyi222666.monarch.common.compileAction
 import io.github.dingyi222666.monarch.common.compileRegExp
 import io.github.dingyi222666.monarch.extension.*
@@ -35,7 +36,7 @@ import io.github.dingyi222666.monarch.extension.*
  * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L70)
  */
 interface IMonarchRule {
-    var regex: Regex
+    var regex: io.github.dingyi222666.kotlin.regex.Regex
     var action: MonarchFuzzyAction
     var matchOnlyAtLineStart: Boolean
     val name: String
@@ -44,7 +45,7 @@ interface IMonarchRule {
 class MonarchRule(
     name: String
 ) : IMonarchRule {
-    override var regex: Regex = Regex("")
+    override var regex: io.github.dingyi222666.kotlin.regex.Regex = GlobalRegexLib.compile("")
     override var action: MonarchFuzzyAction = MonarchFuzzyAction.ActionString("")
     override var matchOnlyAtLineStart = false
     private var innerName: String = name
@@ -55,7 +56,7 @@ class MonarchRule(
     fun setRegex(lexer: IMonarchLexerMin, regexArg: Any) {
         val currentRegex = when(regexArg) {
             is String -> regexArg
-            is Regex -> regexArg.pattern
+            is io.github.dingyi222666.kotlin.regex.Regex -> regexArg.pattern
             else -> throw lexer.createError("rules must start with a match string or regular expression: ${this.name}")
         }
 
