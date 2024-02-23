@@ -34,7 +34,7 @@ Below is a concise summary of the 74 high-light syntax files in the monarch-json
 
 | Regex library                               | Test Results             | Failed languages                                                  | 
 |---------------------------------------------|--------------------------|-------------------------------------------------------------------|
-| Kotlin standard library (running on JVM 17) | 64 successful, 10 failed | liquid, cypher, less, html, scss, twig, wgsl, css, php, handlebar |
+| Kotlin standard library (running on JDK 17) | 64 successful, 10 failed | liquid, cypher, less, html, scss, twig, wgsl, css, php, handlebar |
 | re2j                                        | 64 successful, 10 failed | liquid, cypher, less, html, scss, twig, wgsl, css, php, handlebar |
 | join (oniguruma)                            | 74 successful, 0 failed  | none                                                              |
 
