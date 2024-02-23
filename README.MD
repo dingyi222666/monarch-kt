@@ -30,7 +30,7 @@ Due to the fact that the Java standard library implementation of Regex is not fu
 
 Therefore, we have abstracted a Regex library to ensure that regular expressions are loaded as much as possible.
 
-Below is a concise summary of the 74 high-light syntax files in the monarch-json-loader project’s unit test results.
+Below is a concise summary of the 74 highlight syntax files in the [`monarch-json-loader`](./monarch-json-loader) project’s unit test results.
 
 | Regex library                               | Test Results             | Failed languages                                                  | 
 |---------------------------------------------|--------------------------|-------------------------------------------------------------------|
