@@ -1,0 +1,998 @@
+{
+  "defaultToken": "",
+  "tokenPostfix": ".proto",
+  "brackets": [
+    [
+      "{",
+      "}",
+      "delimiter.curly"
+    ],
+    [
+      "[",
+      "]",
+      "delimiter.square"
+    ],
+    [
+      "(",
+      ")",
+      "delimiter.parenthesis"
+    ],
+    [
+      "<",
+      ">",
+      "delimiter.angle"
+    ]
+  ],
+  "symbols": "[=><!~?:&|+\\-*/^%]+",
+  "keywords": [
+    "syntax",
+    "import",
+    "weak",
+    "public",
+    "package",
+    "option",
+    "repeated",
+    "oneof",
+    "map",
+    "reserved",
+    "to",
+    "max",
+    "enum",
+    "message",
+    "service",
+    "rpc",
+    "stream",
+    "returns",
+    "package",
+    "optional",
+    "true",
+    "false"
+  ],
+  "builtinTypes": [
+    "double",
+    "float",
+    "int32",
+    "int64",
+    "uint32",
+    "uint64",
+    "sint32",
+    "sint64",
+    "fixed32",
+    "fixed64",
+    "sfixed32",
+    "sfixed64",
+    "bool",
+    "string",
+    "bytes"
+  ],
+  "operators": [
+    "=",
+    "+",
+    "-"
+  ],
+  "namedLiterals": [
+    "true",
+    "false"
+  ],
+  "escapes": "\\\\(u{[0-9A-Fa-f]+}|n|r|t|\\\\|'|\\${)",
+  "identifier": "[a-zA-Z]\\w*",
+  "fullIdentifier": "@identifier(?:\\s*\\.\\s*@identifier)*",
+  "optionName": "(?:@identifier|\\(\\s*@fullIdentifier\\s*\\))(?:\\s*\\.\\s*@identifier)*",
+  "messageName": "@identifier",
+  "enumName": "@identifier",
+  "messageType": "\\.?\\s*(?:@identifier\\s*\\.\\s*)*@messageName",
+  "enumType": "\\.?\\s*(?:@identifier\\s*\\.\\s*)*@enumName",
+  "floatLit": "[0-9]+\\s*\\.\\s*[0-9]*(?:@exponent)?|[0-9]+@exponent|\\.[0-9]+(?:@exponent)?",
+  "exponent": "[eE]\\s*[+-]?\\s*[0-9]+",
+  "boolLit": "true\\b|false\\b",
+  "decimalLit": "[1-9][0-9]*",
+  "octalLit": "0[0-7]*",
+  "hexLit": "0[xX][0-9a-fA-F]+",
+  "type": "double|float|int32|int64|uint32|uint64|sint32|sint64|fixed32|fixed64|sfixed32|sfixed64|bool|string|bytes|@messageType|@enumType",
+  "keyType": "int32|int64|uint32|uint64|sint32|sint64|fixed32|fixed64|sfixed32|sfixed64|bool|string",
+  "tokenizer": {
+    "root": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "syntax",
+        "keyword"
+      ],
+      [
+        "=",
+        "operators"
+      ],
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "(\")(proto3)(\")",
+        [
+          "string.quote",
+          "string",
+          {
+            "token": "string.quote",
+            "switchTo": "@topLevel.proto3"
+          }
+        ]
+      ],
+      [
+        "(\")(proto2)(\")",
+        [
+          "string.quote",
+          "string",
+          {
+            "token": "string.quote",
+            "switchTo": "@topLevel.proto2"
+          }
+        ]
+      ],
+      [
+        ".*?",
+        {
+          "token": "",
+          "switchTo": "@topLevel.proto2"
+        }
+      ]
+    ],
+    "topLevel": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        "=",
+        "operators"
+      ],
+      [
+        "[;.]",
+        "delimiter"
+      ],
+      [
+        "@fullIdentifier",
+        {
+          "cases": {
+            "option": {
+              "token": "keyword",
+              "next": "@option.$S2"
+            },
+            "enum": {
+              "token": "keyword",
+              "next": "@enumDecl.$S2"
+            },
+            "message": {
+              "token": "keyword",
+              "next": "@messageDecl.$S2"
+            },
+            "service": {
+              "token": "keyword",
+              "next": "@serviceDecl.$S2"
+            },
+            "extend": {
+              "cases": {
+                "$S2==proto2": {
+                  "token": "keyword",
+                  "next": "@extendDecl.$S2"
+                }
+              }
+            },
+            "@keywords": "keyword",
+            "@default": "identifier"
+          }
+        }
+      ]
+    ],
+    "enumDecl": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "type.identifier"
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "switchTo": "@enumBody.$S2",
+          "bracket": "@open"
+        }
+      ]
+    ],
+    "enumBody": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        "=",
+        "operators"
+      ],
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "option\\b",
+        "keyword",
+        "@option.$S2"
+      ],
+      [
+        "@identifier",
+        "identifier"
+      ],
+      [
+        "\\[",
+        {
+          "token": "@brackets",
+          "next": "@options.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "messageDecl": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "type.identifier"
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "switchTo": "@messageBody.$S2",
+          "bracket": "@open"
+        }
+      ]
+    ],
+    "messageBody": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        "=",
+        "operators"
+      ],
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "(map)(s*)(<)",
+        [
+          "keyword",
+          "white",
+          {
+            "token": "@brackets",
+            "next": "@map.$S2",
+            "bracket": "@open"
+          }
+        ]
+      ],
+      [
+        "@identifier",
+        {
+          "cases": {
+            "option": {
+              "token": "keyword",
+              "next": "@option.$S2"
+            },
+            "enum": {
+              "token": "keyword",
+              "next": "@enumDecl.$S2"
+            },
+            "message": {
+              "token": "keyword",
+              "next": "@messageDecl.$S2"
+            },
+            "oneof": {
+              "token": "keyword",
+              "next": "@oneofDecl.$S2"
+            },
+            "extensions": {
+              "cases": {
+                "$S2==proto2": {
+                  "token": "keyword",
+                  "next": "@reserved.$S2"
+                }
+              }
+            },
+            "reserved": {
+              "token": "keyword",
+              "next": "@reserved.$S2"
+            },
+            "(?:repeated|optional)": {
+              "token": "keyword",
+              "next": "@field.$S2"
+            },
+            "required": {
+              "cases": {
+                "$S2==proto2": {
+                  "token": "keyword",
+                  "next": "@field.$S2"
+                }
+              }
+            },
+            "$S2==proto3": {
+              "token": "@rematch",
+              "next": "@field.$S2"
+            }
+          }
+        }
+      ],
+      [
+        "\\[",
+        {
+          "token": "@brackets",
+          "next": "@options.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "extendDecl": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "type.identifier"
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "switchTo": "@extendBody.$S2",
+          "bracket": "@open"
+        }
+      ]
+    ],
+    "extendBody": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "(?:repeated|optional|required)",
+        "keyword",
+        "@field.$S2"
+      ],
+      [
+        "\\[",
+        {
+          "token": "@brackets",
+          "next": "@options.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "options": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "@optionName",
+        "annotation"
+      ],
+      [
+        "[()]",
+        "annotation.brackets"
+      ],
+      [
+        "=",
+        "operator"
+      ],
+      [
+        "\\]",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "option": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@optionName",
+        "annotation"
+      ],
+      [
+        "[()]",
+        "annotation.brackets"
+      ],
+      [
+        "=",
+        "operator",
+        "@pop"
+      ]
+    ],
+    "oneofDecl": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "identifier"
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "switchTo": "@oneofBody.$S2",
+          "bracket": "@open"
+        }
+      ]
+    ],
+    "oneofBody": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "(@identifier)(\\s*)(=)",
+        [
+          "identifier",
+          "white",
+          "delimiter"
+        ]
+      ],
+      [
+        "@fullIdentifier|\\.",
+        {
+          "cases": {
+            "@builtinTypes": "keyword",
+            "@default": "type.identifier"
+          }
+        }
+      ],
+      [
+        "\\[",
+        {
+          "token": "@brackets",
+          "next": "@options.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "reserved": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        ",",
+        "delimiter"
+      ],
+      [
+        ";",
+        "delimiter",
+        "@pop"
+      ],
+      {
+        "include": "@constant"
+      },
+      [
+        "to\\b|max\\b",
+        "keyword"
+      ]
+    ],
+    "map": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@fullIdentifier|\\.",
+        {
+          "cases": {
+            "@builtinTypes": "keyword",
+            "@default": "type.identifier"
+          }
+        }
+      ],
+      [
+        ",",
+        "delimiter"
+      ],
+      [
+        ">",
+        {
+          "token": "@brackets",
+          "switchTo": "identifier",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "field": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "group",
+        {
+          "cases": {
+            "$S2==proto2": {
+              "token": "keyword",
+              "switchTo": "@groupDecl.$S2"
+            }
+          }
+        }
+      ],
+      [
+        "(@identifier)(\\s*)(=)",
+        [
+          "identifier",
+          "white",
+          {
+            "token": "delimiter",
+            "next": "@pop"
+          }
+        ]
+      ],
+      [
+        "@fullIdentifier|\\.",
+        {
+          "cases": {
+            "@builtinTypes": "keyword",
+            "@default": "type.identifier"
+          }
+        }
+      ]
+    ],
+    "groupDecl": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "identifier"
+      ],
+      [
+        "=",
+        "operator"
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "switchTo": "@messageBody.$S2",
+          "bracket": "@open"
+        }
+      ],
+      {
+        "include": "@constant"
+      }
+    ],
+    "type": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "type.identifier",
+        "@pop"
+      ],
+      [
+        ".",
+        "delimiter"
+      ]
+    ],
+    "identifier": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "identifier",
+        "@pop"
+      ]
+    ],
+    "serviceDecl": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "identifier"
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "switchTo": "@serviceBody.$S2",
+          "bracket": "@open"
+        }
+      ]
+    ],
+    "serviceBody": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "option\\b",
+        "keyword",
+        "@option.$S2"
+      ],
+      [
+        "rpc\\b",
+        "keyword",
+        "@rpc.$S2"
+      ],
+      [
+        "\\[",
+        {
+          "token": "@brackets",
+          "next": "@options.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "rpc": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@identifier",
+        "identifier"
+      ],
+      [
+        "\\(",
+        {
+          "token": "@brackets",
+          "switchTo": "@request.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "next": "@methodOptions.$S2",
+          "bracket": "@open"
+        }
+      ],
+      [
+        ";",
+        "delimiter",
+        "@pop"
+      ]
+    ],
+    "request": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@messageType",
+        {
+          "cases": {
+            "stream": {
+              "token": "keyword",
+              "next": "@type.$S2"
+            },
+            "@default": "type.identifier"
+          }
+        }
+      ],
+      [
+        "\\)",
+        {
+          "token": "@brackets",
+          "switchTo": "@returns.$S2",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "returns": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "returns\\b",
+        "keyword"
+      ],
+      [
+        "\\(",
+        {
+          "token": "@brackets",
+          "switchTo": "@response.$S2",
+          "bracket": "@open"
+        }
+      ]
+    ],
+    "response": [
+      {
+        "include": "@whitespace"
+      },
+      [
+        "@messageType",
+        {
+          "cases": {
+            "stream": {
+              "token": "keyword",
+              "next": "@type.$S2"
+            },
+            "@default": "type.identifier"
+          }
+        }
+      ],
+      [
+        "\\)",
+        {
+          "token": "@brackets",
+          "switchTo": "@rpc.$S2",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "methodOptions": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        ";",
+        "delimiter"
+      ],
+      [
+        "option",
+        "keyword"
+      ],
+      [
+        "@optionName",
+        "annotation"
+      ],
+      [
+        "[()]",
+        "annotation.brackets"
+      ],
+      [
+        "=",
+        "operator"
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "comment": [
+      [
+        "[^\\/*]+",
+        "comment"
+      ],
+      [
+        "\\/\\*",
+        "comment",
+        "@push"
+      ],
+      [
+        "\\*/",
+        "comment",
+        "@pop"
+      ],
+      [
+        "[\\/*]",
+        "comment"
+      ]
+    ],
+    "string": [
+      [
+        "[^\\\"]+",
+        "string"
+      ],
+      [
+        "@escapes",
+        "string.escape"
+      ],
+      [
+        "\\.",
+        "string.escape.invalid"
+      ],
+      [
+        "\"",
+        {
+          "token": "string.quote",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "stringSingle": [
+      [
+        "[^\\']+",
+        "string"
+      ],
+      [
+        "@escapes",
+        "string.escape"
+      ],
+      [
+        "\\.",
+        "string.escape.invalid"
+      ],
+      [
+        "'",
+        {
+          "token": "string.quote",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ],
+    "constant": [
+      [
+        "@boolLit",
+        "keyword.constant"
+      ],
+      [
+        "@hexLit",
+        "number.hex"
+      ],
+      [
+        "@octalLit",
+        "number.octal"
+      ],
+      [
+        "@decimalLit",
+        "number"
+      ],
+      [
+        "@floatLit",
+        "number.float"
+      ],
+      [
+        "(\"([^\"\\]|\\.)*|'([^'\\]|\\.)*)$",
+        "string.invalid"
+      ],
+      [
+        "\"",
+        {
+          "token": "string.quote",
+          "next": "@string",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "'",
+        {
+          "token": "string.quote",
+          "next": "@stringSingle",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "{",
+        {
+          "token": "@brackets",
+          "next": "@prototext",
+          "bracket": "@open"
+        }
+      ],
+      [
+        "identifier",
+        "identifier"
+      ]
+    ],
+    "whitespace": [
+      [
+        "[ \\t\\r\\n]+",
+        "white"
+      ],
+      [
+        "\\/\\*",
+        "comment",
+        "@comment"
+      ],
+      [
+        "\\/\\/.*$",
+        "comment"
+      ]
+    ],
+    "prototext": [
+      {
+        "include": "@whitespace"
+      },
+      {
+        "include": "@constant"
+      },
+      [
+        "@identifier",
+        "identifier"
+      ],
+      [
+        "[:;]",
+        "delimiter"
+      ],
+      [
+        "}",
+        {
+          "token": "@brackets",
+          "next": "@pop",
+          "bracket": "@close"
+        }
+      ]
+    ]
+  }
+}

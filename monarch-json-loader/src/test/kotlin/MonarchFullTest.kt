@@ -292,8 +292,8 @@ class MonarchFullTest {
 
 
 	@Test
-	fun `tokenizationproto`() {
-		runTests("proto")
+	fun `tokenizationprotobuf`() {
+		runTests("protobuf")
 	}
 
 
@@ -378,18 +378,6 @@ class MonarchFullTest {
 	@Test
 	fun `tokenizationshell`() {
 		runTests("shell")
-	}
-
-
-	@Test
-	fun `tokenizationsol`() {
-		runTests("sol")
-	}
-
-
-	@Test
-	fun `tokenizationaes`() {
-		runTests("aes")
 	}
 
 

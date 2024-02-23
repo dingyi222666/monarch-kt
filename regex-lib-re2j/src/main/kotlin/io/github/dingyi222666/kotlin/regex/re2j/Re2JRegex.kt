@@ -21,25 +21,28 @@ package io.github.dingyi222666.kotlin.regex.re2j
 
 import com.google.re2j.Pattern
 import io.github.dingyi222666.kotlin.regex.*
+import io.github.dingyi222666.kotlin.regex.standard.StandardRegex
+import io.github.dingyi222666.kotlin.regex.standard.StandardRegexScanner
 
 
 class Re2JRegexLib(
     cacheSize: Int = 20
 ) : RegexLib {
-    private val cache = LRUCache<CharSequence, Re2JRegex>(cacheSize)
 
-    override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
-        return StandardRegexScanner(patterns, this)
+    private val cache = LRUCache<Int, Re2JRegex>(cacheSize)
+
+    override fun createRegexScanner(patterns: Array<CharSequence>): Re2JRegexScanner {
+        return Re2JRegexScanner(patterns, this)
     }
 
-
     override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): Re2JRegex {
-        val cached = cache.get(str)
-        return cached ?: Re2JRegex(str, regexOption).also { cache.put(str, it) }
+        val key = str.hashCode() + (regexOption?.toInt() ?: 0)
+        val cached = cache.get(key)
+        return cached ?: Re2JRegex(str, regexOption).also { cache.put(key, it) }
     }
 }
 
-class StandardRegexScanner(
+class Re2JRegexScanner(
     patterns: Array<CharSequence>,
     regexLib: Re2JRegexLib
 ) : RegexScanner {
@@ -91,12 +94,24 @@ class Re2JRegex(
 
     override val options = regexOption ?: setOf(RegexOption.NONE)
 
-    private val nativeRegex = kotlin.runCatching {
-        Pattern.compile(pattern.toString(), regexOption?.map { it.toRe2JRegexOption() }?.toInt() ?: 0)
-    }.getOrElse {
-        val rawPattern = pattern.toString().replace("{?", "\\{?")
-        Pattern.compile(rawPattern, regexOption?.map { it.toRe2JRegexOption() }?.toInt() ?: 0)
-    }
+    private val nativeRegex =
+        kotlin.runCatching {
+            java.util.regex.Pattern.compile(pattern.toString(), regexOption?.toInt() ?: 0)
+        }.getOrElse {
+            val rawPatternString = pattern.toString()
+
+            // fuck ecma regex...
+            var exception: Exception? = null
+            for (pattern in patterns) {
+                try {
+                    return@getOrElse java.util.regex.Pattern.compile(pattern.invoke(rawPatternString), regexOption?.toInt() ?: 0)
+                } catch (e: Exception) {
+                    exception = e
+                    continue
+                }
+            }
+            throw Exception("Can't compile regex $pattern $exception")
+        }
 
     override val pattern: String
         get() = nativeRegex.pattern()
@@ -176,6 +191,21 @@ class Re2JRegex(
 
         return sb.toString()
     }
+
+    companion object {
+        private val patterns = arrayOf(
+            { rawPattern: String -> rawPattern.replace("[[", "[") },
+            { rawPattern: String -> rawPattern.replace("{", "\\{") },
+            { rawPattern: String -> rawPattern.replace("{", "\\{").replace("^", "\\^") },
+            { rawPattern: String -> rawPattern.replace("([", "(\\[") },
+
+            { rawPattern: String -> rawPattern
+                .replace("\\","\\\\")
+
+            },
+            // { rawPattern: String -> rawPattern.replace("\\p{", "").replace("}", "") }
+        )
+    }
 }
 
 
@@ -196,11 +226,6 @@ enum class Re2JRegexOption(override val value: Int, override val mask: Int = val
      * respectively, a line terminator or the end of the input sequence. */
     MULTILINE(Pattern.MULTILINE),
 
-    //jvm-specific
-
-
-    /** Enables the mode, when the expression `.` matches any character, including a line terminator. */
-    DOT_MATCHES_ALL(Pattern.DOTALL),
 
 }
 

@@ -24,10 +24,10 @@ import java.util.regex.Pattern
 
 
 class StandardRegexLib(
-    cacheSize: Int = 20
+    cacheSize: Int = 200
 ) : RegexLib {
 
-    private val cache = LRUCache<CharSequence, StandardRegex>(cacheSize)
+    private val cache = LRUCache<Int, StandardRegex>(cacheSize)
 
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
         return StandardRegexScanner(patterns, this)
@@ -35,8 +35,9 @@ class StandardRegexLib(
 
 
     override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): StandardRegex {
-        val cached = cache.get(str)
-        return cached ?: StandardRegex(str, regexOption).also { cache.put(str, it) }
+        val key = str.hashCode() + (regexOption?.toInt() ?: 0)
+        val cached = cache.get(key)
+        return cached ?: StandardRegex(str, regexOption).also { cache.put(key, it) }
     }
 }
 
@@ -113,8 +114,7 @@ class StandardRegex(
             throw Exception("Can't compile regex $pattern $exception")
         }
 
-    override val pattern: String
-        get() = nativeRegex.pattern()
+    override val pattern: String by lazy(LazyThreadSafetyMode.NONE) { nativeRegex.pattern() }
 
     private var lastSearchString: CharSequence? = null
 
@@ -123,7 +123,7 @@ class StandardRegex(
     private var lastSearchResult: MatchResult? = null
 
     override fun containsMatchIn(input: CharSequence): Boolean {
-        return nativeRegex.matcher(input.toString()).find()
+        return nativeRegex.matcher(input).find()
     }
 
     override fun search(input: CharSequence, startPosition: Int, cached: Boolean): MatchResult? {
@@ -134,12 +134,13 @@ class StandardRegex(
                     && lastSearchPosition <= startPosition
                     && (lastSearchResult0 == null || lastSearchResult0.range.first >= startPosition)
                 ) {
-                    return lastSearchResult0;
+                    return lastSearchResult0
                 }
             }
         }
 
         val result = searchInternal(input, startPosition)
+
         synchronized(this) {
             lastSearchString = input
             lastSearchPosition = startPosition
@@ -158,8 +159,8 @@ class StandardRegex(
         val groupCount = matcher.groupCount()
         val groups = Array(groupCount + 1) { i ->
             val group = matcher.group(i) ?: ""
-            val start = matcher.start(i) ?: 0
-            val end = matcher.end(i) ?: 0
+            val start = matcher.start(i)
+            val end = matcher.end(i)
             MatchGroup(
                 value = group,
                 range = IntRange(start, end)
@@ -195,8 +196,12 @@ class StandardRegex(
             { rawPattern: String -> rawPattern.replace("{", "\\{") },
             { rawPattern: String -> rawPattern.replace("{", "\\{").replace("^", "\\^") },
             { rawPattern: String -> rawPattern.replace("([", "(\\[") },
-            { rawPattern: String -> rawPattern.replace("\\", "\\\\") },
-            { rawPattern: String -> rawPattern.replace("\\p{", "").replace("}", "") }
+
+            { rawPattern: String -> rawPattern
+                .replace("\\","\\\\")
+
+            },
+           // { rawPattern: String -> rawPattern.replace("\\p{", "").replace("}", "") }
         )
     }
 

@@ -23,23 +23,24 @@
 package io.github.dingyi222666.kotlin.regex.oniguruma
 
 import io.github.dingyi222666.kotlin.regex.*
+import org.joni.Option
 import org.joni.Syntax
+import java.util.regex.Pattern
 
 class OnigRegexLib(
-    cacheSize: Int = 10000
+    cacheSize: Int = 100
 ) : RegexLib {
-    private val cache = LRUCache<CharSequence, OnigRegex>(cacheSize)
+    private val cache = LRUCache<Int, OnigRegex>(cacheSize)
 
-    var syntax = Syntax.ECMAScript
 
     override fun createRegexScanner(patterns: Array<CharSequence>): RegexScanner {
         return OnigRegexScanner(patterns, this)
     }
 
-
     override fun compile(str: CharSequence, regexOption: Set<RegexOption>?): OnigRegex {
-        val cached = cache.get(str)
-        return cached ?: OnigRegex(str, regexOption, syntax).also { cache.put(str, it) }
+        val key = str.hashCode() + (regexOption?.toInt() ?: 0)
+        val cached = cache.get(key)
+        return cached ?: OnigRegex(str, regexOption).also { cache.put(key, it) }
     }
 
     override fun compile(str: CharSequence, vararg regexOption: RegexOption): OnigRegex {
@@ -49,4 +50,34 @@ class OnigRegexLib(
 
 fun applyOnigRegexLibToGlobal() {
     GlobalRegexLib.defaultRegexLib = OnigRegexLib()
+}
+
+
+/**
+ * Provides enumeration values to use to set regular expression options.
+ */
+enum class OnigRegexOption(override val value: Int, override val mask: Int = value) : FlagEnum {
+    // common
+
+    NONE(0),
+
+    /** Enables case-insensitive matching. Case comparison is Unicode-aware. */
+    IGNORE_CASE(Option.IGNORECASE),
+
+    /** Enables multiline mode.
+     *
+     * In multiline mode the expressions `^` and `$` match just after or just before,
+     * respectively, a line terminator or the end of the input sequence. */
+    MULTILINE(Option.MULTILINE),
+
+
+    UNICODE_CASE(Option.POSIX_REGION),
+
+}
+
+fun RegexOption.toOnigRegexOption() = when (this) {
+    RegexOption.IGNORE_CASE -> OnigRegexOption.IGNORE_CASE
+    RegexOption.MULTILINE -> OnigRegexOption.MULTILINE
+    RegexOption.UNICODE_CASE -> OnigRegexOption.UNICODE_CASE
+    else -> throw IllegalArgumentException("Unsupported regex option: $this")
 }

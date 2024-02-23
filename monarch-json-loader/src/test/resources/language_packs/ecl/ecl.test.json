@@ -1,4 +1,6 @@
 {
-	"tests": [],
-	"languages": ["ecl"]
+  "tests": [],
+  "languages": [
+    "ecl"
+  ]
 }

@@ -53,9 +53,7 @@ abstract class Regex {
 
     fun replace(source: String, target: String) = replace(source) { target }
 
-    fun matches(input: CharSequence): Boolean {
-        return search(input, 0) != null
-    }
+    fun matches(input: CharSequence): Boolean = containsMatchIn(input)
 
 }
 

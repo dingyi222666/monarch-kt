@@ -31,8 +31,12 @@ import kotlin.test.assertEquals
 
 
 fun runTests(language: String) {
+    // If both of the following lines are commented out,
+    // then a default regular expression is used for implementation.
+
     //applyRe2JRegexLibToGlobal()
-    //applyOnigRegexLibToGlobal()
+    // default: oniguruma
+    applyOnigRegexLibToGlobal()
 
     val languageRegistry = LanguageRegistry()
     val (languageId, tests) = registerLanguage(languageRegistry, mutableListOf(language))
@@ -49,25 +53,28 @@ fun runTests(language: String) {
 
         for ((subIndex, subTest) in test1.withIndex()) {
             val result = tokenizer.tokenize(subTest.line, true, state)
-            state = result.endState;
+            state = result.endState
             assertEquals(subTest.tokens, result.tokens.map {
                 Token(it.offset, it.type)
             }, "The tokens are not equal in line root[$index][$subIndex]: ${subTest.line}")
         }
     }
+
+    languageRegistry.clear()
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-private fun registerLanguage(
+private tailrec fun registerLanguage(
     languageRegistry: LanguageRegistry,
-    registryLanguages: MutableList<String>
+    registryLanguages: MutableList<String>,
+    pair: Pair<String, List<List<Test>>>? = null
 ): Pair<String, List<List<Test>>> {
-    val language = registryLanguages.removeLastOrNull() ?: return "" to emptyList()
+    val language = registryLanguages.removeLastOrNull() ?: return pair ?: ("" to emptyList())
     val languageJson = File("src/test/resources/language_packs/$language/$language.json").absoluteFile
 
     if (!languageJson.exists()) {
         System.err.println("Language $language not found")
-        return "" to emptyList()
+        return pair ?: ("" to emptyList())
     }
     val testLanguageJson = File("src/test/resources/language_packs/$language/$language.test.json")
 
@@ -75,9 +82,16 @@ private fun registerLanguage(
 
     val tests = testAdapter.fromJson(testLanguageJson.readText()) ?: error("Test file not found")
 
+
     val willRegisteredLanguages = (tests.languages.filter { it != language } + registryLanguages)
         .distinct()
         .toMutableList()
+
+    if (language == "mdx") {
+        willRegisteredLanguages.add("javascript")
+    } else if (language == "handlebars") {
+        willRegisteredLanguages.addAll(listOf("html"))
+    }
 
     val monarchLanguage = loadMonarchJson(languageJson.readText()) ?: error("Language $language not found")
 
@@ -88,13 +102,19 @@ private fun registerLanguage(
     val tokenPostfix = monarchLanguage.tokenPostfix ?: ""
     val languageName =
         if (tokenPostfix.isNotEmpty()) {
-            tokenPostfix.substring(tokenPostfix.indexOf("."))
+            tokenPostfix.substring(tokenPostfix.indexOf(".") + 1)
         } else language
+
 
     val baseEmbeddingLanguages = mapOf(
         "text/javascript" to "js",
-        "javascript" to "js"
+        "javascript" to "js",
+        "text/x-handlebars-template" to "handlebars"
     )
+
+    if (languageRegistry.isRegisteredLanguage(languageName)) {
+        return pair ?: (languageName to tests.tests)
+    }
 
     languageRegistry.registerLanguage(
         Language(
@@ -105,9 +125,7 @@ private fun registerLanguage(
         )
     )
 
-    registerLanguage(languageRegistry, willRegisteredLanguages)
-
-    return languageName to tests.tests
+    return registerLanguage(languageRegistry, willRegisteredLanguages, pair ?: (languageName to tests.tests))
 }
 
 

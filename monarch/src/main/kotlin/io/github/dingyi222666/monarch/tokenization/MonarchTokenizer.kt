@@ -527,7 +527,6 @@ class MonarchTokenizer(
         if (embeddedLanguageData.state === NullState && languageId.contains("/")) {
             languageId = languageId.substringAfterLast("/")
             embeddedLanguageData = getNestedEmbeddedLanguageData(languageId)
-            println(languageId)
         }
 
         if (pos < lineLength) {

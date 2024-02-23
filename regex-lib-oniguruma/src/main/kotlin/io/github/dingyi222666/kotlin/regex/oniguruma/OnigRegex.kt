@@ -37,31 +37,40 @@ typealias NativeRegex = org.joni.Regex
 
 class OnigRegex(
     pattern: CharSequence,
-    regexOption: Set<RegexOption>? = null,
-    syntax: Syntax = Syntax.DEFAULT
+    regexOption: Set<RegexOption>? = null
 ) : Regex() {
     override val options = regexOption ?: setOf(RegexOption.NONE)
     override val pattern by lazy(LazyThreadSafetyMode.NONE) { pattern.toString() }
 
+    private val nativeRegex = run {
+        val removeGlobalPattern = this.pattern
+            .removePrefix("\\G")
+            .toByteArray(StandardCharsets.UTF_8)
 
-    private val nativeRegex =
+        val option = Option.CAPTURE_GROUP or options.map { it.toOnigRegexOption() }.toInt()
         kotlin.runCatching {
-            val removeGlobalPattern = this.pattern
-                .removePrefix("\\G")
-                .toByteArray(StandardCharsets.UTF_8)
             NativeRegex(
                 removeGlobalPattern,
                 0,
                 removeGlobalPattern.size,
-                Option.CAPTURE_GROUP or options.toInt(),
+                option,
                 UTF8Encoding.INSTANCE,
-                Syntax.DEFAULT,
+                Syntax.ECMAScript,
                 WarnCallback.DEFAULT
             )
         }.getOrElse {
-           throw    IllegalArgumentException("Invalid pattern: $pattern")
 
+            NativeRegex(
+                removeGlobalPattern,
+                0,
+                removeGlobalPattern.size,
+                option,
+                UTF8Encoding.INSTANCE,
+                Syntax.Grep,
+                WarnCallback.DEFAULT
+            )
         }
+    }
 
     private var lastSearchString: CharSequence? = null
 
@@ -188,3 +197,4 @@ class OnigRegex(
         return OnigStringFactory.create(input)
     }
 }
+

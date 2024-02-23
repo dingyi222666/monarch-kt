@@ -63,6 +63,10 @@ class LanguageRegistry(
         regexLib: RegexLib = GlobalRegexLib,
         maxTokenizationLineLength: Int = 5000
     ) {
+        if (this.isRegisteredLanguage(language.languageId)) {
+            throw IllegalArgumentException("Language already registered: " + language.languageId)
+        }
+
         this.languageIdToLanguages[language.languageId] = language
 
         if (compileToTokenizer) {

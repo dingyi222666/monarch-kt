@@ -25,7 +25,7 @@ package io.github.dingyi222666.kotlin.regex.oniguruma
 import io.github.dingyi222666.kotlin.regex.LRUCache
 
 object OnigStringFactory {
-    private var onigStringCache = LRUCache<String, OnigString>(1000000)
+    private var onigStringCache = LRUCache<String, OnigString>(100000)
 
     fun create(string: String): OnigString {
         return onigStringCache.get(string) ?: OnigString.create(string).also {

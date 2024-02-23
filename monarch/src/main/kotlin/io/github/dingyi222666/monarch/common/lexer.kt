@@ -80,11 +80,18 @@ fun IMonarchLexerMin.compileRegExp(str: String): io.github.dingyi222666.kotlin.r
 
     str = str.replace("\u0001", "@")
 
-    return if (ignoreCase) {
-        this.regexLib.compile(str, RegexOption.IGNORE_CASE)
-    } else {
-        this.regexLib.compile(str)
+    val options = mutableSetOf<RegexOption>()
+
+    if (ignoreCase) {
+        options.add(RegexOption.IGNORE_CASE)
     }
+
+    if (unicode) {
+        options.add(RegexOption.UNICODE_CASE)
+    }
+
+    return regexLib.compile(str, options)
+
 }
 
 
@@ -455,13 +462,17 @@ fun IMonarchLanguage.compile(languageId: String, regexLib: RegexLib = GlobalRege
                     newrule.setAction(lexerMin, rule1);
                 }*/
                 val copyOfAction = action.copy(next = rule.nextState)
-                println(rule.nextState)
                 newRule.setAction(lexerMin, copyOfAction)
             } else {
                 action?.let { newRule.setAction(lexerMin, it) }
             }
 
-            newRule.setRegex(lexerMin, rule.regex)
+            try {
+                newRule.setRegex(lexerMin, rule.regex)
+            } catch (e: Throwable) {
+                System.err.println("compileRegexError: ${rule.regex}")
+                throw e
+            }
 
             newRules.add(newRule)
         }

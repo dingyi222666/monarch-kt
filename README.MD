@@ -22,7 +22,31 @@ We not only ported the core code of monarch, but also supported the following ad
 - Minimal implementation. By default, it does not integrate JSON loading support, making it easy and fast to integrate into your project.
 
 ## TODO
-- [ ] Highlighting support for some common languages (requires additional package)
+- [ ] Highlighting support for some popular languages (requires additional package)
+
+## Compatibility
+
+Due to the fact that the Java standard library implementation of Regex is not fully compatible with PERL, you may encounter difficulties in loading high-light syntax files that are written and run in non-JVM environments using JSON or Kotlin DSL in the standard library’s Regex.
+
+Therefore, we have abstracted a Regex library to ensure that regular expressions are loaded as much as possible.
+
+Below is a concise summary of the 74 high-light syntax files in the monarch-json-loader project’s unit test results.
+
+| Regex library                               | Test Results             | Failed languages                                                  | 
+|---------------------------------------------|--------------------------|-------------------------------------------------------------------|
+| Kotlin standard library (running on JVM 17) | 64 successful, 10 failed | liquid, cypher, less, html, scss, twig, wgsl, css, php, handlebar |
+| re2j                                        | 64 successful, 10 failed | liquid, cypher, less, html, scss, twig, wgsl, css, php, handlebar |
+| join (oniguruma)                            | 74 successful, 0 failed  | none                                                              |
+
+You can [view](./monarch-json-loader/src/test) the source code of the test files and their high-light syntaxes for more information.
+
+If you are writing your own high-light syntaxes, I suggest you use regular expressions that are compatible with Java’s regular expression standards when writing your syntaxes and then directly use the standard library’s Regex. This way, the high-light loading speed can be faster.
+
+If you are using other people’s high-light syntaxes, I suggest you try the standard library’s built-in regular expressions first. If the loading fails and you do not have the ability to make secondary modifications, you can then use other regular expression libraries.
+
+`re2j` may perform better than the standard library’s regular expressions in some aspects, but I have not verified this. 
+
+join has excellent compatibility and I recommend most people use this regular expression library.
 
 ## Usage
 
