@@ -394,6 +394,11 @@ class MonarchLanguageCaseActionScope {
     }
 
     @MonarchDSL
+    infix fun String.actionArray(block: MonarchLanguageActionArrayScope.() -> Unit) {
+        caseMaps[this] = buildMonarchLanguageActionArray(block)
+    }
+
+    @MonarchDSL
     infix fun String.and(shortAction: String) {
         caseMaps[this] = MonarchLanguageAction.ShortLanguageAction(shortAction)
     }

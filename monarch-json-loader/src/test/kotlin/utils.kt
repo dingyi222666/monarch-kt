@@ -136,7 +136,7 @@ data class Tests(
 )
 
 @JsonClass(generateAdapter = true)
-data class Test(
+class Test(
     val line: String,
     val tokens: List<Token>
 )

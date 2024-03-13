@@ -26,7 +26,7 @@ We not only ported the core code of monarch, but also supported the following ad
 
 ## Compatibility
 
-Due to the fact that the Java standard library implementation of Regex is not fully compatible with PERL, you may encounter difficulties in loading high-light syntax files that are written and run in non-JVM environments using JSON or Kotlin DSL in the standard library’s Regex.
+Due to the fact that the Java standard library implementation of Regex is not fully compatible with PERL, you may encounter difficulties in loading highLight syntax files that are written and run in non-JVM environments using JSON or Kotlin DSL in the standard library’s Regex.
 
 Therefore, we have abstracted a Regex library to ensure that regular expressions are loaded as much as possible.
 
@@ -38,11 +38,11 @@ Below is a concise summary of the 74 highlight syntax files in the [`monarch-jso
 | re2j                                        | 64 successful, 10 failed | liquid, cypher, less, html, scss, twig, wgsl, css, php, handlebar |
 | join (oniguruma)                            | 74 successful, 0 failed  | none                                                              |
 
-You can [view](./monarch-json-loader/src/test) the source code of the test files and their high-light syntaxes for more information.
+You can [view](./monarch-json-loader/src/test) the source code of the test files and their highLight syntaxes for more information.
 
-If you are writing your own high-light syntaxes, I suggest you use regular expressions that are compatible with Java’s regular expression standards when writing your syntaxes and then directly use the standard library’s Regex. This way, the high-light loading speed can be faster.
+If you are writing your own highLight syntaxes, I suggest you use regular expressions that are compatible with Java’s regular expression standards when writing your syntaxes and then directly use the standard library’s Regex. This way, the highLight loading speed can be faster.
 
-If you are using other people’s high-light syntaxes, I suggest you try the standard library’s built-in regular expressions first. If the loading fails and you do not have the ability to make secondary modifications, you can then use other regular expression libraries.
+If you are using other people’s highLight syntaxes, I suggest you try the standard library’s built-in regular expressions first. If the loading fails and you do not have the ability to make secondary modifications, you can then use other regular expression libraries.
 
 `re2j` may perform better than the standard library’s regular expressions in some aspects, but I have not verified this. 
 

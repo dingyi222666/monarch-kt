@@ -32,7 +32,6 @@ import io.github.dingyi222666.monarch.types.MonarchLanguageRule
 import java.util.*
 
 
-
 /**
  * Compile to Kotlin DSL
  *
@@ -46,7 +45,7 @@ fun IMonarchLanguage.toKotlinDSL(
     val codeBlock = compileMonarchLanguageToKotlinDSL(this, CodeBlock.builder())
 
     val file = FileSpec.builder(packageName, fileName)
-        .addImport("io.github.dingyi222666.monarch.common","LanguageScope")
+        .addImport("io.github.dingyi222666.monarch.common", "LanguageScope")
         .addKotlinDefaultImports(includeJvm = true)
         .addProperty(PropertySpec.builder(
             // val Monarch
@@ -67,7 +66,10 @@ fun IMonarchLanguage.toKotlinDSL(
 
     file.writeTo(builder)
 
-    return builder.toString().replace("io.github.dingyi222666.monarch.common.LanguageScope", "io.github.dingyi222666.monarch.common.*")
+    return builder.toString().replace(
+        "io.github.dingyi222666.monarch.common.LanguageScope",
+        "io.github.dingyi222666.monarch.common.*\n import io.github.dingyi222666.monarch.loader.dsl.*"
+    )
 }
 
 private fun compileMonarchLanguageToKotlinDSL(language: IMonarchLanguage, codeBlock: CodeBlock.Builder): CodeBlock {
@@ -134,18 +136,18 @@ private fun compileMonarchLanguageToKotlinDSL(language: IMonarchLanguage, codeBl
         when (value) {
             is String -> if (builtinStringMethod.contains(key)) {
                 // symbols("")
-                codeBlock.addStatement("%N(%P)", key, value)
+                codeBlock.addStatement("%N(%S)", key, value)
             } else {
                 // "symbols" and "xxx"
-                codeBlock.addStatement("%S and %P", key, value)
+                codeBlock.addStatement("%S and %S", key, value)
             }
 
             is Regex -> if (builtinStringMethod.contains(key)) {
                 // symbols("")
-                codeBlock.addStatement("%N(%P)", key, value.pattern)
+                codeBlock.addStatement("%N(%S)", key, value.pattern)
             } else {
                 // "symbols" and "xxx"
-                codeBlock.addStatement("%S and %P", key, value.pattern)
+                codeBlock.addStatement("%S and %S", key, value.pattern)
             }
 
             is List<*> -> if (builtinArrayMethod.contains(key)) {
@@ -192,7 +194,7 @@ private fun compileMonarchLanguageRulesToKotlinDSL(
             codeBlock.beginControlFlow("%N", key)
         } else {
             // root rules { ...
-            codeBlock.beginControlFlow("%N rules", key)
+            codeBlock.beginControlFlow("%S rules", key)
         }
 
         for (rule in value) {
@@ -211,18 +213,13 @@ private fun regexToString(rawRegex: Any): String {
     val rawString = when (rawRegex) {
         is String -> rawRegex
         is Regex -> rawRegex.pattern
+        is io.github.dingyi222666.kotlin.regex.Regex -> rawRegex.pattern
         else -> throw Exception("Unsupported type of $rawRegex in rules")
     }
 
     // escape current "\n" -> "\\n", and more
 
     return rawString
-        /*.replace("\\", "\\\\")
-        .replace("\"", "\\\"")*/
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t")
-
 
 }
 
@@ -234,14 +231,14 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
             when (val action = rule.action) {
                 is MonarchLanguageAction.ShortLanguageAction -> {
                     //  "[A-Z][\\w\$]*" token "type.identifier"
-                    codeBlock.addStatement("%P token %S", regexToString(rule.regex), action.token)
+                    codeBlock.addStatement("%S.token(%S)", regexToString(rule.regex), action.token)
                 }
 
                 // "(')(@escapes)(')" actionArray {
                 //   ....
                 //  }
                 is MonarchLanguageAction.ActionArray -> {
-                    codeBlock.beginControlFlow("%P actionArray", regexToString(rule.regex))
+                    codeBlock.beginControlFlow("%S.actionArray", regexToString(rule.regex))
                     compileMonarchLanguageArrayActionToKotlinDSL(action, codeBlock)
                     codeBlock.endControlFlow()
                 }
@@ -250,7 +247,7 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                 //   token = 111
                 // }
                 is MonarchLanguageAction.ExpandedLanguageAction -> {
-                    codeBlock.beginControlFlow("%P action", regexToString(rule.regex))
+                    codeBlock.beginControlFlow("%S.action", regexToString(rule.regex))
                     compileMonarchExpandedLanguageActionToKotlinDSL(action, codeBlock)
                     codeBlock.endControlFlow()
                 }
@@ -266,7 +263,7 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                 is MonarchLanguageAction.ShortLanguageAction -> {
                     //  "[A-Z][\\w\$]*" token "type.identifier"
                     codeBlock.addStatement(
-                        "%P action %S state %S",
+                        "%S.action(%S).state(%S)",
                         regexToString(rule.regex),
                         action.token,
                         rule.nextState
@@ -277,8 +274,9 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                 //   ....
                 //  }
                 is MonarchLanguageAction.ActionArray -> {
-                    throw  Exception("Unsupported type of $action in short rules 2")
-
+                    codeBlock.beginControlFlow("%S actionArray", regexToString(rule.regex))
+                    compileMonarchLanguageArrayActionToKotlinDSL(action, codeBlock)
+                    codeBlock.endControlFlow()
                 }
 
                 // "xxx" action {
@@ -290,10 +288,10 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
                         action.goBack != null ||
                         action.switchTo != null ||
                         action.cases != null ||
-                        action.nextEmbedded != null  ||
+                        action.nextEmbedded != null ||
                         action.group != null
                     ) {
-                        codeBlock.beginControlFlow("%P action", regexToString(rule.regex))
+                        codeBlock.beginControlFlow("%S action", regexToString(rule.regex))
                         action.next = rule.nextState
                         compileMonarchExpandedLanguageActionToKotlinDSL(action, codeBlock)
                         codeBlock.endControlFlow()
@@ -302,7 +300,7 @@ private fun compileMonarchLanguageRuleToKotlinDSL(
 
 
                     codeBlock.addStatement(
-                        "%P action %S state %S",
+                        "%S action %S state %S",
                         regexToString(rule.regex),
                         action.token,
                         rule.nextState
@@ -353,7 +351,9 @@ private fun compileMonarchLanguageArrayActionToKotlinDSL(
                     codeBlock.endControlFlow()
                 } else {
                     // expanded action { ... }
+                    codeBlock.beginControlFlow("action")
                     compileMonarchExpandedLanguageActionToKotlinDSL(action, codeBlock)
+                    codeBlock.endControlFlow()
                 }
             }
 
@@ -427,7 +427,13 @@ private fun compileMonarchExpandedLanguageActionToKotlinDSL(
                     codeBlock.addStatement("%S and %S", key, value.token)
                 }
 
-                else -> throw Exception("Unsupported type of cases $value")
+                is MonarchLanguageAction.ActionArray -> {
+                    // 'xx" actionArray { ... }
+                    codeBlock.beginControlFlow("%S actionArray", key)
+                    compileMonarchLanguageArrayActionToKotlinDSL(value, codeBlock)
+                    codeBlock.endControlFlow()
+                }
+
             }
         }
 
@@ -455,5 +461,11 @@ private fun compileMonarchLanguageBracketsToKotlinDSL(
 
 // ['1','2','3'] -> "1","2","3"
 private fun List<*>.formatStringArgs(): String {
-    return joinToString(separator = ", ") { "\"$it\"" }
+    return joinToString(separator = ", ") {
+        "\"${
+            it.toString()
+                .replace("\\", "\\\\")
+                .replace("\$", "\\$")
+        }\""
+    }
 }
