@@ -56,9 +56,12 @@ fun IMonarchLanguage.toKotlinDSL(
                 }
             }Language",
             IMonarchLanguage::class,
-        ).initializer(
-            // =
-            codeBlock
+        ).delegate(
+            CodeBlock.builder()
+                .beginControlFlow("lazy")
+                .add(codeBlock)
+                .endControlFlow()
+                .build()
         ).build())
         .build()
 
