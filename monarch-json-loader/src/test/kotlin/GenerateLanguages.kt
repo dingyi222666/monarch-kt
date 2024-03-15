@@ -1,3 +1,7 @@
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.moshi.adapter
 import io.github.dingyi222666.kotlin.regex.match
 import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
@@ -7,7 +11,9 @@ import io.github.dingyi222666.monarch.loader.dsl.toKotlinDSL
 import io.github.dingyi222666.monarch.loader.json.MoshiRoot
 import io.github.dingyi222666.monarch.loader.json.loadMonarchJson
 import io.github.dingyi222666.monarch.loader.json.toMonarchJson
+import io.github.dingyi222666.monarch.types.IMonarchLanguage
 import java.io.File
+import java.util.*
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,7 +49,7 @@ class GenerateLanguages {
         val dir = File("src/test/resources/language_packs/")
 
         val result = mutableListOf<RawLanguage>()
-        val registry = LanguageRegistry()
+        val registry = LanguageRegistry.instance
         dir.walk()
             .filter { file -> file.isFile && file.name.endsWith(".test.json") }
             .map { it.name.replace(".test.json", "") }
@@ -83,6 +89,39 @@ class GenerateLanguages {
             }
         }
     }
+
+    @Test
+    fun generateLanguageTests() {
+        val rawLanguages = scanLanguages()
+
+        val fileSpec = FileSpec.builder("", "LanguageTests")
+            .addImport("io.github.dingyi222666.monarch.common", "LanguageScope")
+            .addKotlinDefaultImports(includeJvm = true)
+
+
+
+        for (rawLanguage in rawLanguages) {
+            val languageName = rawLanguage.languageName
+            val upperCaseLanguageName = languageName.replaceFirstChar { it.uppercaseChar() }
+            val func = FunSpec.builder("testLanguage${languageName}")
+                .addAnnotation(Test::class)
+                .build()
+            val block = CodeBlock.builder()
+
+            println(rawLanguage.dependencies)
+            val subLanguages =
+                rawLanguages.filter { rawLanguage.dependencies.contains(it.instance.languageName) }
+
+            println(subLanguages)
+
+            fileSpec.addFunction(func)
+        }
+
+
+        val file = fileSpec.build()
+
+        println(file.writeTo(System.out))
+    }
 }
 
 
@@ -114,7 +153,7 @@ private tailrec fun getLanguage(
     if (currentLanguage == "mdx") {
         willRegisteredLanguages.add("javascript")
     } else if (currentLanguage == "handlebars") {
-        willRegisteredLanguages.addAll(listOf("html"))
+        willRegisteredLanguages.add("html")
     }
 
     val monarchLanguage = loadMonarchJson(languageJson.readText()) ?: error("Language $currentLanguage not found")
@@ -155,8 +194,9 @@ private tailrec fun getLanguage(
         rawLanguage ?: RawLanguage(
             languageName,
             languageJson.path,
-            testLanguageJson.path, tests.languages,
-            language
+            testLanguageJson.path, willRegisteredLanguages,
+            language,
+            tests
         )
     )
 }
@@ -167,5 +207,6 @@ data class RawLanguage(
     val languageJsonPath: String,
     val languageTestPath: String,
     val dependencies: List<String>,
-    val instance: Language
+    val instance: Language,
+    val tests: Tests
 )
