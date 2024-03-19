@@ -469,6 +469,7 @@ private fun List<*>.formatStringArgs(): String {
             it.toString()
                 .replace("\\", "\\\\")
                 .replace("\$", "\\$")
+                .replace("\"", "\\\"")
         }\""
     }
 }

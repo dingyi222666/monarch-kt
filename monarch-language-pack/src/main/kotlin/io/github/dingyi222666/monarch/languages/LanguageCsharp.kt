@@ -4,7 +4,7 @@ import io.github.dingyi222666.monarch.common.*
  import io.github.dingyi222666.monarch.loader.dsl.*
 import io.github.dingyi222666.monarch.types.IMonarchLanguage
 
-public val CsLanguage: IMonarchLanguage by lazy {
+public val CsharpLanguage: IMonarchLanguage by lazy {
   buildMonarchLanguage {
     tokenPostfix = ".cs"
     defaultToken = ""

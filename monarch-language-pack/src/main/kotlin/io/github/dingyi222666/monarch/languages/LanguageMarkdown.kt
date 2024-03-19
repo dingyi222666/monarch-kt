@@ -4,7 +4,7 @@ import io.github.dingyi222666.monarch.common.*
  import io.github.dingyi222666.monarch.loader.dsl.*
 import io.github.dingyi222666.monarch.types.IMonarchLanguage
 
-public val MdLanguage: IMonarchLanguage by lazy {
+public val MarkdownLanguage: IMonarchLanguage by lazy {
   buildMonarchLanguage {
     tokenPostfix = ".md"
     defaultToken = ""

@@ -24,7 +24,7 @@ import kotlin.test.assertEquals
  */
 
 
-fun runTests(mainLanguage: Language, tests: Tests, subLanguage: List<Language>) {
+fun runTests(mainLanguage: Language, subLanguage: List<Language>, tests: Tests) {
     // If both of the following lines are commented out,
     // then a default regular expression is used for implementation.
 
@@ -34,13 +34,14 @@ fun runTests(mainLanguage: Language, tests: Tests, subLanguage: List<Language>) 
 
     val languageRegistry = LanguageRegistry()
 
-    registerLanguages(languageRegistry,subLanguage + mainLanguage)
+
+    registerLanguages(languageRegistry, subLanguage + mainLanguage)
 
     val tokenizer = languageRegistry.getTokenizer(mainLanguage.languageId)
         ?: throw Exception("Language ${mainLanguage.languageName} not found")
 
     for ((index, test1) in tests.tests.withIndex()) {
-        var state = tokenizer.getInitialState();
+        var state = tokenizer.getInitialState()
 
         for ((subIndex, subTest) in test1.withIndex()) {
             val result = tokenizer.tokenize(subTest.line, true, state)
@@ -56,7 +57,7 @@ fun runTests(mainLanguage: Language, tests: Tests, subLanguage: List<Language>) 
 
 fun registerLanguages(languageRegistry: LanguageRegistry, languages: List<Language>) {
     for (language in languages) {
-        languageRegistry.registerLanguage(language,true)
+        languageRegistry.registerLanguage(language, true)
     }
 }
 
@@ -78,3 +79,5 @@ data class Token(
     val startIndex: Int,
     val type: String
 )
+
+typealias TestKotlin = kotlin.test.Test

@@ -4,7 +4,7 @@ import io.github.dingyi222666.monarch.common.*
  import io.github.dingyi222666.monarch.loader.dsl.*
 import io.github.dingyi222666.monarch.types.IMonarchLanguage
 
-public val RstLanguage: IMonarchLanguage by lazy {
+public val RestructuredtextLanguage: IMonarchLanguage by lazy {
   buildMonarchLanguage {
     tokenPostfix = ".rst"
     defaultToken = ""

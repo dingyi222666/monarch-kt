@@ -44,7 +44,7 @@ public val PerlLanguage: IMonarchLanguage by lazy {
         "delete", "keys", "semop", "waitpid", "DESTROY", "kill", "send", "wantarray", "die", "last",
         "setgrent", "warn", "dump", "lc", "sethostent", "write", "each", "lcfirst", "setnetent")
     "builtinFileHandlers" and listOf("ARGV", "STDERR", "STDOUT", "ARGVOUT", "STDIN", "ENV")
-    "builtinVariables" and listOf("\$!", "\$^RE_TRIE_MAXBUF", "\$LAST_REGEXP_CODE_RESULT", "\$"",
+    "builtinVariables" and listOf("\$!", "\$^RE_TRIE_MAXBUF", "\$LAST_REGEXP_CODE_RESULT", "\$\"",
         "\$^S", "\$LIST_SEPARATOR", "\$#", "\$^T", "\$MATCH", "\$\$", "\$^TAINT",
         "\$MULTILINE_MATCHING", "\$%", "\$^UNICODE", "\$NR", "\$&", "\$^UTF8LOCALE", "\$OFMT",
         "\$'", "\$^V", "\$OFS", "\$(", "\$^W", "\$ORS", "\$)", "\$^WARNING_BITS", "\$OS_ERROR",

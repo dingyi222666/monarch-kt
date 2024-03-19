@@ -30,7 +30,7 @@ public val RLanguage: IMonarchLanguage by lazy {
         "category", "character", "complex", "double", "function", "integer", "list", "logical",
         "matrix", "numeric", "vector", "data.frame", "factor", "library", "require", "attach",
         "detach", "source")
-    "special" and listOf("\\n", "\\r", "\\t", "\\b", "\\a", "\\f", "\\v", "\\'", "\\"", "\\\\")
+    "special" and listOf("\\n", "\\r", "\\t", "\\b", "\\a", "\\f", "\\v", "\\'", "\\\"", "\\\\")
     tokenizer {
       root {
         include("@numbers")

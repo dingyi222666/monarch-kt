@@ -4,7 +4,7 @@ import io.github.dingyi222666.monarch.common.*
  import io.github.dingyi222666.monarch.loader.dsl.*
 import io.github.dingyi222666.monarch.types.IMonarchLanguage
 
-public val GqlLanguage: IMonarchLanguage by lazy {
+public val GraphqlLanguage: IMonarchLanguage by lazy {
   buildMonarchLanguage {
     tokenPostfix = ".gql"
     defaultToken = "invalid"
