@@ -14,10 +14,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-
+ *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex.oniguruma
+package io.github.dingyi222666.regex.oniguruma
 
 
 import org.jcodings.specific.UTF8Encoding

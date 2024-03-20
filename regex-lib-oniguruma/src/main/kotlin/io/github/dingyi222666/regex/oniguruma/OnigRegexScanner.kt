@@ -15,12 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex.oniguruma
+package io.github.dingyi222666.regex.oniguruma
 
-import io.github.dingyi222666.kotlin.regex.CaptureIndex
-import io.github.dingyi222666.kotlin.regex.RegexScanner
+import io.github.dingyi222666.regex.CaptureIndex
+import io.github.dingyi222666.regex.RegexScanner
 
 
 class OnigRegexScanner(

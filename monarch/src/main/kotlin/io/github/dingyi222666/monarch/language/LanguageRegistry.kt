@@ -22,8 +22,8 @@
 
 package io.github.dingyi222666.monarch.language
 
-import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
-import io.github.dingyi222666.kotlin.regex.RegexLib
+import io.github.dingyi222666.regex.GlobalRegexLib
+import io.github.dingyi222666.regex.RegexLib
 import io.github.dingyi222666.monarch.common.compile
 import io.github.dingyi222666.monarch.tokenization.MonarchTokenizer
 import io.github.dingyi222666.monarch.types.IThemeService

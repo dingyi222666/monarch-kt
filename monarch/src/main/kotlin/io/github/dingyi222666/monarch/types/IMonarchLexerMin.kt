@@ -27,7 +27,7 @@
 
 package io.github.dingyi222666.monarch.types
 
-import io.github.dingyi222666.kotlin.regex.RegexLib
+import io.github.dingyi222666.regex.RegexLib
 
 /**
  * Minimal interface for a Monarch lexer.

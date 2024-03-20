@@ -1,7 +1,7 @@
 /*
  * monarch-kt - Kotlin port of Monarch library.
  * https://github.com/dingyi222666/monarch-kt
- * Copyright (C) 2024 dingyi
+ * Copyright (C) 2024-2024  dingyi
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Initial code from https://github.com/microsoft/vscode
+ * Initial copyright Copyright (C) Microsoft Corporation. All rights reserved.
+ * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex
+package io.github.dingyi222666.regex
 
 import java.util.*
 

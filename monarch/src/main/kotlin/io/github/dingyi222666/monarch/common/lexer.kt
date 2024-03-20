@@ -23,9 +23,9 @@
 
 package io.github.dingyi222666.monarch.common
 
-import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
-import io.github.dingyi222666.kotlin.regex.RegexLib
-import io.github.dingyi222666.kotlin.regex.RegexOption
+import io.github.dingyi222666.regex.GlobalRegexLib
+import io.github.dingyi222666.regex.RegexLib
+import io.github.dingyi222666.regex.RegexOption
 import io.github.dingyi222666.monarch.extension.*
 import io.github.dingyi222666.monarch.types.*
 
@@ -44,7 +44,7 @@ internal val wordsRegex = "@(\\w+)".toRegex()
  * @example /@attr/ will be replaced with the value of lexer.attr
  * @example /@@text/ will not be replaced and will become /@text/.
  */
-fun IMonarchLexerMin.compileRegExp(str: String): io.github.dingyi222666.kotlin.regex.Regex {
+fun IMonarchLexerMin.compileRegExp(str: String): io.github.dingyi222666.regex.Regex {
 
     // @@ must be interpreted as a literal @, so we replace all occurrences of @@ with a placeholder character
     var str = str.replace(regex1, "\u0001")

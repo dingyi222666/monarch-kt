@@ -22,8 +22,8 @@
 
 package io.github.dingyi222666.monarch.tokenization
 
-import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
-import io.github.dingyi222666.kotlin.regex.RegexLib
+import io.github.dingyi222666.regex.GlobalRegexLib
+import io.github.dingyi222666.regex.RegexLib
 import io.github.dingyi222666.monarch.extension.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.types.*

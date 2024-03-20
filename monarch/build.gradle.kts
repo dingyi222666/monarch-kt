@@ -19,9 +19,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
+    id("com.vanniktech.maven.publish.base")
 }
 
-group = "io.github.dingyi222666.kotlin.monarch"
+group = "io.github.dingyi222666.monarch"
 version = "1.0"
 
 repositories {

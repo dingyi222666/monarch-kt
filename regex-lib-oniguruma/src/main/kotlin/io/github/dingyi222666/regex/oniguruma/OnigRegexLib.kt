@@ -20,12 +20,11 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex.oniguruma
+package io.github.dingyi222666.regex.oniguruma
 
-import io.github.dingyi222666.kotlin.regex.*
+import io.github.dingyi222666.regex.*
+import io.github.dingyi222666.regex.regex.*
 import org.joni.Option
-import org.joni.Syntax
-import java.util.regex.Pattern
 
 class OnigRegexLib(
     cacheSize: Int = 100

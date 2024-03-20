@@ -20,17 +20,20 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex.oniguruma
+package io.github.dingyi222666.regex.oniguruma
 
 
-import io.github.dingyi222666.kotlin.regex.*
+import io.github.dingyi222666.regex.MatchResult
+import io.github.dingyi222666.regex.Regex
+import io.github.dingyi222666.regex.RegexOption
+import io.github.dingyi222666.regex.regex.*
+import io.github.dingyi222666.regex.toInt
 import org.jcodings.specific.UTF8Encoding
 import org.joni.Matcher
 import org.joni.Option
 import org.joni.Syntax
 import org.joni.WarnCallback
 import java.nio.charset.StandardCharsets
-import java.util.regex.Pattern
 import kotlin.math.max
 
 typealias NativeRegex = org.joni.Regex

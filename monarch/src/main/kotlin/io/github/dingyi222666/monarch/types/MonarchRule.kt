@@ -27,17 +27,17 @@
 
 package io.github.dingyi222666.monarch.types
 
-import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
+import io.github.dingyi222666.regex.GlobalRegexLib
 import io.github.dingyi222666.monarch.common.compileAction
 import io.github.dingyi222666.monarch.common.compileRegExp
 import io.github.dingyi222666.monarch.extension.*
-import io.github.dingyi222666.kotlin.regex.Regex
+import io.github.dingyi222666.regex.Regex
 
 /**
  * See [here](https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCommon.ts#L70)
  */
 interface IMonarchRule {
-    var regex: io.github.dingyi222666.kotlin.regex.Regex
+    var regex: Regex
     var action: MonarchFuzzyAction
     var matchOnlyAtLineStart: Boolean
     val name: String
@@ -46,7 +46,7 @@ interface IMonarchRule {
 class MonarchRule(
     name: String
 ) : IMonarchRule {
-    override var regex: io.github.dingyi222666.kotlin.regex.Regex = GlobalRegexLib.compile("")
+    override var regex: Regex = GlobalRegexLib.compile("")
     override var action: MonarchFuzzyAction = MonarchFuzzyAction.ActionString("")
     override var matchOnlyAtLineStart = false
     private var innerName: String = name

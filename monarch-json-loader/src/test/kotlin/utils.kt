@@ -1,7 +1,6 @@
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
-import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
-import io.github.dingyi222666.kotlin.regex.re2j.applyRe2JRegexLibToGlobal
+import io.github.dingyi222666.regex.oniguruma.applyOnigRegexLibToGlobal
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.json.MoshiRoot

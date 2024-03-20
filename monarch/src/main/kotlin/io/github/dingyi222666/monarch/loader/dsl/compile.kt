@@ -216,7 +216,7 @@ private fun regexToString(rawRegex: Any): String {
     val rawString = when (rawRegex) {
         is String -> rawRegex
         is Regex -> rawRegex.pattern
-        is io.github.dingyi222666.kotlin.regex.Regex -> rawRegex.pattern
+        is io.github.dingyi222666.regex.Regex -> rawRegex.pattern
         else -> throw Exception("Unsupported type of $rawRegex in rules")
     }
 

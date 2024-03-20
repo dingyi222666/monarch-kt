@@ -1,5 +1,5 @@
-import io.github.dingyi222666.kotlin.regex.GlobalRegexLib
-import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
+import io.github.dingyi222666.regex.GlobalRegexLib
+import io.github.dingyi222666.regex.oniguruma.applyOnigRegexLibToGlobal
 import io.github.dingyi222666.monarch.common.*
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.dsl.*

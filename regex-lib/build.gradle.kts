@@ -18,10 +18,11 @@
 
 
 plugins {
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm")
+    id("com.vanniktech.maven.publish.base")
 }
 
-group = "io.github.dingyi222666.kotlin.regex-lib"
+group = "io.github.dingyi222666.regex-lib"
 version = "1.0.0"
 
 repositories {

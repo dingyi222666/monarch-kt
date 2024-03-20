@@ -20,9 +20,9 @@
  * Initial license: MIT
  */
 
-package io.github.dingyi222666.kotlin.regex.oniguruma
+package io.github.dingyi222666.regex.oniguruma
 
-import io.github.dingyi222666.kotlin.regex.LRUCache
+import io.github.dingyi222666.regex.LRUCache
 
 object OnigStringFactory {
     private var onigStringCache = LRUCache<String, OnigString>(100000)

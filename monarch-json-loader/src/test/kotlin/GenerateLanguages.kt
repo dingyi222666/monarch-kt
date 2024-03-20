@@ -18,23 +18,16 @@
  */
 
 import com.squareup.kotlinpoet.*
-import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapter
 
-import io.github.dingyi222666.kotlin.regex.match
-import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
+import io.github.dingyi222666.regex.oniguruma.applyOnigRegexLibToGlobal
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import io.github.dingyi222666.monarch.loader.dsl.toKotlinDSL
 import io.github.dingyi222666.monarch.loader.json.MoshiRoot
 import io.github.dingyi222666.monarch.loader.json.loadMonarchJson
 import io.github.dingyi222666.monarch.loader.json.toMonarchJson
-import io.github.dingyi222666.monarch.types.IMonarchLanguage
 import java.io.File
-import java.util.*
-
-
-import kotlin.test.assertEquals
 
 
 typealias TestKotlin = kotlin.test.Test

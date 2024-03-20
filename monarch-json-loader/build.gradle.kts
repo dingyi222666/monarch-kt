@@ -1,9 +1,10 @@
 plugins {
-    kotlin("jvm") version "1.9.0"
-    id("com.google.devtools.ksp").version("1.9.0-1.0.13")
+    kotlin("jvm")
+    id("com.google.devtools.ksp")
+    id("com.vanniktech.maven.publish.base")
 }
 
-group = "io.github.dingyi222666.kotlin.monarch"
+group = "io.github.dingyi222666.monarch"
 version = "1.0"
 
 repositories {

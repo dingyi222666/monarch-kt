@@ -1,5 +1,5 @@
 import com.squareup.moshi.JsonClass
-import io.github.dingyi222666.kotlin.regex.oniguruma.applyOnigRegexLibToGlobal
+import io.github.dingyi222666.regex.oniguruma.applyOnigRegexLibToGlobal
 import io.github.dingyi222666.monarch.language.Language
 import io.github.dingyi222666.monarch.language.LanguageRegistry
 import kotlin.test.assertEquals
