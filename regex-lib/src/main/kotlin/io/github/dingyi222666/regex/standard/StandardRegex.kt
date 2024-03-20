@@ -25,7 +25,6 @@ package io.github.dingyi222666.regex.standard
 import io.github.dingyi222666.regex.*
 import io.github.dingyi222666.regex.MatchResult
 import io.github.dingyi222666.regex.RegexOption
-import io.github.dingyi222666.regex.regex.*
 import java.util.regex.Pattern
 
 

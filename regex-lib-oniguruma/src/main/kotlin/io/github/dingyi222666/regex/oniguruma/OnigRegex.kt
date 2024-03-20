@@ -26,7 +26,6 @@ package io.github.dingyi222666.regex.oniguruma
 import io.github.dingyi222666.regex.MatchResult
 import io.github.dingyi222666.regex.Regex
 import io.github.dingyi222666.regex.RegexOption
-import io.github.dingyi222666.regex.regex.*
 import io.github.dingyi222666.regex.toInt
 import org.jcodings.specific.UTF8Encoding
 import org.joni.Matcher

@@ -23,7 +23,6 @@
 package io.github.dingyi222666.regex.oniguruma
 
 import io.github.dingyi222666.regex.*
-import io.github.dingyi222666.regex.regex.*
 import org.joni.Option
 
 class OnigRegexLib(

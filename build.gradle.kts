@@ -30,7 +30,7 @@ plugins {
 fun MavenPublishBaseExtension.applyMonarchProjects(project: Project) {
     pom {
         name.set(project.name)
-        description.set("An RegexLib with multi implement in JVM")
+        description.set("A RegexLib with multi regex implement in JVM")
         inceptionYear.set("2024")
         url.set("https://github.com/dingyi222666/monarch-kt/tree/main/regex-lib")
         licenses {
@@ -57,7 +57,7 @@ fun MavenPublishBaseExtension.applyMonarchProjects(project: Project) {
 
 fun MavenPublishBaseExtension.applyRegexLibProjects(project: Project) = pom {
     name.set(project.name)
-    description.set("AA kotlin port of monarch.")
+    description.set("A kotlin port of monarch.")
     inceptionYear.set("2024")
     url.set("https://github.com/dingyi222666/monarch-kt")
     licenses {
