@@ -33,8 +33,8 @@ import io.github.dingyi222666.monarch.types.*
 
 // Lexer helpers
 
-internal val regex1 = "@@".toRegex()
-internal val wordsRegex = "@(\\w+)".toRegex()
+val regex1 = "@@".toRegex()
+val wordsRegex = "@(\\w+)".toRegex()
 
 
 /**
@@ -94,7 +94,6 @@ fun IMonarchLexerMin.compileRegExp(str: String): io.github.dingyi222666.regex.Re
 
 }
 
-
 // Compiles guard functions for case matches.
 // This compiles 'cases' attributes into efficient match functions.
 fun selectScrutinee(id: String, matches: List<String>, state: String, num: Int): String? {
@@ -107,7 +106,7 @@ fun selectScrutinee(id: String, matches: List<String>, state: String, num: Int):
 
     if (num >= 100) {
         val currentNum = num - 100
-        val parts = state.split(".").toMutableList()
+        val parts = state.split('.').toMutableList()
         parts.add(0, state)
         if (currentNum < parts.size) {
             return parts[currentNum]

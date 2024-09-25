@@ -31,7 +31,7 @@ interface ITokenizationSupport {
 
     fun getInitialState(): TokenizeState
 
-    fun tokenize(line: String, hasEOL: Boolean, lineState: TokenizeState): TokenizationResult
+    fun tokenize(line: CharSequence, hasEOL: Boolean, lineState: TokenizeState): TokenizationResult
 
-    fun tokenizeEncoded(line: String, hasEOL: Boolean, lineState: TokenizeState): EncodedTokenizationResult;
+    fun tokenizeEncoded(line: CharSequence, hasEOL: Boolean, lineState: TokenizeState): EncodedTokenizationResult;
 }

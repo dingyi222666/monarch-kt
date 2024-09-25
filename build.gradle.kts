@@ -23,11 +23,11 @@ import com.vanniktech.maven.publish.*
 plugins {
     kotlin("jvm") version "1.9.20" apply false
     id("com.google.devtools.ksp").version("1.9.20-1.0.14") apply false
-    id("com.vanniktech.maven.publish.base").version("0.28.0") apply false
+    id("com.vanniktech.maven.publish.base").version("0.29.0") apply false
 }
 
 
-fun MavenPublishBaseExtension.applyMonarchProjects(project: Project) {
+fun MavenPublishBaseExtension.applyRegexLibProjects(project: Project) {
     pom {
         name.set(project.name)
         description.set("A RegexLib with multi regex implement in JVM")
@@ -55,7 +55,7 @@ fun MavenPublishBaseExtension.applyMonarchProjects(project: Project) {
     }
 }
 
-fun MavenPublishBaseExtension.applyRegexLibProjects(project: Project) = pom {
+fun MavenPublishBaseExtension.applyMonarchProjects(project: Project) = pom {
     name.set(project.name)
     description.set("A kotlin port of monarch.")
     inceptionYear.set("2024")

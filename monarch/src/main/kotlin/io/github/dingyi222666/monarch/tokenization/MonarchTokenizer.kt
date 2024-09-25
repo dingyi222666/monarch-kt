@@ -51,7 +51,7 @@ class MonarchTokenizer(
         return MonarchLineStateFactory.create(rootState, null)
     }
 
-    override fun tokenize(line: String, hasEOL: Boolean, lineState: TokenizeState): TokenizationResult {
+    override fun tokenize(line: CharSequence, hasEOL: Boolean, lineState: TokenizeState): TokenizationResult {
         if (line.length >= maxTokenizationLineLength) {
             return nullTokenize(languageId, lineState)
         }
@@ -60,7 +60,11 @@ class MonarchTokenizer(
         return tokensCollector.finalize(endLineState)
     }
 
-    override fun tokenizeEncoded(line: String, hasEOL: Boolean, lineState: TokenizeState): EncodedTokenizationResult {
+    override fun tokenizeEncoded(
+        line: CharSequence,
+        hasEOL: Boolean,
+        lineState: TokenizeState
+    ): EncodedTokenizationResult {
         if (line.length >= maxTokenizationLineLength) {
             return nullTokenizeEncoded(LanguageId.Null, lineState)
         }
@@ -71,7 +75,7 @@ class MonarchTokenizer(
     }
 
     private fun tokenizeImpl(
-        line: String,
+        line: CharSequence,
         hasEOL: Boolean,
         lineState: MonarchLineState,
         collector: IMonarchTokensCollector
@@ -83,7 +87,7 @@ class MonarchTokenizer(
         }
     }
 
-    private fun findLeavingNestedLanguageOffset(line: String, state: MonarchLineState): Int {
+    private fun findLeavingNestedLanguageOffset(line: CharSequence, state: MonarchLineState): Int {
         val rules = lexer.tokenizer[state.stack.state]
         /* do parent matching */
             ?: lexer.findRules(state.stack.state)
@@ -130,7 +134,7 @@ class MonarchTokenizer(
     }
 
     private fun nestedTokenize(
-        line: String,
+        line: CharSequence,
         hasEOL: Boolean,
         lineState: MonarchLineState,
         offsetDelta: Int,
@@ -162,12 +166,12 @@ class MonarchTokenizer(
             )
         }
 
-        val restOfTheLine = line.substring(popOffset)
+        val restOfTheLine = line.subSequence(popOffset, line.length)
         return defaultTokenizeImpl(restOfTheLine, hasEOL, lineState, offsetDelta + popOffset, tokensCollector)
     }
 
     private fun defaultTokenizeImpl(
-        lineWithoutLF: String,
+        lineWithoutLF: CharSequence,
         hasEOL: Boolean,
         lineState: MonarchLineState,
         offsetDelta: Int,
@@ -176,7 +180,8 @@ class MonarchTokenizer(
         tokensCollector.enterLanguage(languageId)
 
         val lineWithoutLFLength = lineWithoutLF.length
-        val line = if (hasEOL && lexer.includeLF) lineWithoutLF + '\n' else lineWithoutLF
+        val line =
+            if (hasEOL && lexer.includeLF) StringBuilder(lineWithoutLF).append('\n') else StringBuilder(lineWithoutLF)
         val lineLength = line.length
 
         var embeddedLanguageData = lineState.embeddedLanguageData
@@ -231,7 +236,7 @@ class MonarchTokenizer(
 
 
                 // try each rule until we match
-                val restOfLine = line.substring(pos)
+                val restOfLine = line.subSequence(pos, lineLength)
                 for (rule in rules) {
                     if (pos == 0 || !rule.matchOnlyAtLineStart) {
                         val currentMatches = rule.regex.search(restOfLine)?.groupValues
@@ -399,7 +404,7 @@ class MonarchTokenizer(
 
             // is the result a group match?
             if (result is MonarchFuzzyAction.ActionArray) {
-                if (groupMatching != null && groupMatching.groups.size > 0) {
+                if (groupMatching != null && groupMatching.groups.isNotEmpty()) {
                     throw lexer.createError("groups cannot be nested: " + this.safeRuleName(rule))
                 }
 
@@ -433,7 +438,7 @@ class MonarchTokenizer(
                     groupMatching.groups.add(
                         GroupMatching.Group(
                             action = action,
-                            matched = matches!![index + 1],
+                            matched = matches?.get(index + 1).toString()
                         )
                     )
                 }
@@ -456,7 +461,7 @@ class MonarchTokenizer(
                     // a state transition should occur.
                     if (enteringEmbeddedLanguage !== null) {
                         return computeNewStateForEmbeddedLanguage(
-                            enteringEmbeddedLanguage,
+                            enteringEmbeddedLanguage.intern(),
                             pos, lineLength, lineWithoutLF, hasEOL, offsetDelta, tokensCollector, stack
                         )
                     }
@@ -479,19 +484,20 @@ class MonarchTokenizer(
 
                 // return the result (and check for brace matching)
                 // todo: for efficiency we could pre-sanitize tokenPostfix and substitutions
+                val tokenStringBuilder = StringBuilder()
                 val tokenType =
                     if (
-                        (result is MonarchFuzzyAction.ActionString) && result.token.indexOf("@brackets") == 0) {
+                        (result is MonarchFuzzyAction.ActionString) && result.token.startsWith("@brackets")) {
                         val rest = result.token.substring("@brackets".length)
                         val bracket = lexer.findBracket(matched)
                             ?: throw lexer.createError(
                                 "@brackets token returned but no bracket defined as: $matched"
                             )
-                        (bracket.token + rest).sanitize()
+                        tokenStringBuilder.append(bracket.token).append(rest).sanitize()
                     } else {
                         val rawToken = (result as MonarchFuzzyAction.ActionString).token
                         val token = if (rawToken.isEmpty()) "" else rawToken + lexer.tokenPostfix
-                        token.sanitize()
+                        tokenStringBuilder.append(token).sanitize()
                     }
 
                 if (pos0 < lineWithoutLFLength) {
@@ -514,7 +520,7 @@ class MonarchTokenizer(
         enteringEmbeddedLanguage: String,
         pos: Int,
         lineLength: Int,
-        lineWithoutLF: String,
+        lineWithoutLF: CharSequence,
         hasEOL: Boolean,
         offsetDelta: Int,
         tokensCollector: IMonarchTokensCollector,

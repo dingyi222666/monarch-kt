@@ -34,7 +34,7 @@ interface IMonarchTokensCollector {
     fun enterLanguage(languageId: String)
     fun emit(startOffset: Int, type: String)
     fun nestedLanguageTokenize(
-            embeddedLanguageLine: String,
+            embeddedLanguageLine: CharSequence,
             hasEOL: Boolean,
             embeddedLanguageData: EmbeddedLanguageData,
             offsetDelta: Int

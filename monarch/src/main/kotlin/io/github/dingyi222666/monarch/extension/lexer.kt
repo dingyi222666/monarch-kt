@@ -29,14 +29,18 @@ import java.util.*
 // https://github.com/microsoft/vscode/blob/7215958b3c57945b49d3b70afdba7fb47319ca85/src/vs/editor/standalone/common/monarch/monarchCompile.ts
 
 /** Puts a string to lower case if 'ignoreCase' is set. */
-fun IMonarchLexerMin.fixCase(str: String): String = if (ignoreCase) str.lowercase(Locale.getDefault()) else str
+fun IMonarchLexerMin.fixCase(str: String): String =
+    if (ignoreCase) str.lowercase(Locale.getDefault()) else str
 
 private val sanitizeRegex = Regex("[&<>'\"_]")
 
-internal fun String.sanitize(): String {
-    return replace(sanitizeRegex, "-") // used on all output token CSS classes
+fun StringBuilder.sanitize(): String {
+    var result = this
+    sanitizeRegex.findAll(this).forEach { matchResult ->
+        result.setCharAt(matchResult.range.first, '-')
+    }
+    return result.toString().intern()
 }
-
 // Helper functions for rule finding and substitution
 
 val substituteRegex = Regex("\\$((\\$)|(#)|(\\d\\d?)|[sS](\\d\\d?)|@(\\w+))")
@@ -69,7 +73,7 @@ fun IMonarchLexerMin.substituteMatches(
             return@replace this[attr] as String // @attribute
         }
         if (stateMatches == null) { // split state on demand
-            val matchesList = state.split(".").toMutableList()
+            val matchesList = state.split('.').toMutableList()
             matchesList.add(0, state)
             stateMatches = matchesList
         }
@@ -81,6 +85,7 @@ fun IMonarchLexerMin.substituteMatches(
         return@replace ""
     }
 }
+
 
 /** Find the tokenizer rules for a specific state (i.e. next action) */
 fun IMonarchLexer.findRules(inState: String): List<MonarchRule>? {

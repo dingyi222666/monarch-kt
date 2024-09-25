@@ -22,7 +22,7 @@ We not only ported the core code of monarch, but also supported the following ad
 - Minimal implementation. By default, it does not integrate JSON loading support, making it easy and fast to integrate into your project.
 
 ## TODO
-- [ ] Highlighting support for some popular languages (requires additional package)
+- [x] Highlighting support for some popular languages (requires additional package)
 
 ## Compatibility
 

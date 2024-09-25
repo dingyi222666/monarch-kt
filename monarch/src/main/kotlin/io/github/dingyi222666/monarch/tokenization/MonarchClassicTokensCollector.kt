@@ -56,7 +56,7 @@ class MonarchClassicTokensCollector(
     }
 
     override fun nestedLanguageTokenize(
-        embeddedLanguageLine: String,
+        embeddedLanguageLine: CharSequence,
         hasEOL: Boolean,
         embeddedLanguageData: EmbeddedLanguageData,
         offsetDelta: Int
