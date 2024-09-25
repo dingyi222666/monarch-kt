@@ -23,7 +23,7 @@ plugins {
 }
 
 group = "io.github.dingyi222666.regex-lib"
-version = "1.0.1"
+version = "1.0.2"
 
 repositories {
     mavenCentral()

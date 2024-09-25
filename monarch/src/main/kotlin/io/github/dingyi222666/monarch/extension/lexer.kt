@@ -23,6 +23,7 @@
 package io.github.dingyi222666.monarch.extension
 
 import io.github.dingyi222666.monarch.types.*
+import io.github.dingyi222666.regex.LRUCache
 import java.util.*
 
 
@@ -33,13 +34,21 @@ fun IMonarchLexerMin.fixCase(str: String): String =
     if (ignoreCase) str.lowercase(Locale.getDefault()) else str
 
 private val sanitizeRegex = Regex("[&<>'\"_]")
+private val cacheTokens = LRUCache<String, String>(1000)
 
-fun StringBuilder.sanitize(): String {
-    var result = this
-    sanitizeRegex.findAll(this).forEach { matchResult ->
-        result.setCharAt(matchResult.range.first, '-')
+fun String.sanitize(): String {
+
+    val sanitizeValue = cacheTokens.get(this)
+
+    if (sanitizeValue != null) {
+        return sanitizeValue
     }
-    return result.toString().intern()
+
+    val result = this.replace(sanitizeRegex, "-")
+
+    cacheTokens.put(this, result)
+
+    return result
 }
 // Helper functions for rule finding and substitution
 

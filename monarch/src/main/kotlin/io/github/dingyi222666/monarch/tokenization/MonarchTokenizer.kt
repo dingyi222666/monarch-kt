@@ -493,11 +493,11 @@ class MonarchTokenizer(
                             ?: throw lexer.createError(
                                 "@brackets token returned but no bracket defined as: $matched"
                             )
-                        tokenStringBuilder.append(bracket.token).append(rest).sanitize()
+                        tokenStringBuilder.append(bracket.token).append(rest).toString().sanitize()
                     } else {
                         val rawToken = (result as MonarchFuzzyAction.ActionString).token
                         val token = if (rawToken.isEmpty()) "" else rawToken + lexer.tokenPostfix
-                        tokenStringBuilder.append(token).sanitize()
+                        token.sanitize()
                     }
 
                 if (pos0 < lineWithoutLFLength) {
