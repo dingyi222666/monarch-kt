@@ -23,7 +23,7 @@ plugins {
 }
 
 group = "io.github.dingyi222666.regex-lib"
-version = "1.0.2"
+version = "1.0.3"
 
 repositories {
     mavenCentral()
@@ -32,7 +32,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(project(":regex-lib"))
-    implementation("org.jruby.joni:joni:2.1.43")
+    implementation("org.jruby.joni:joni:2.2.1")
 }
 
 tasks.test {

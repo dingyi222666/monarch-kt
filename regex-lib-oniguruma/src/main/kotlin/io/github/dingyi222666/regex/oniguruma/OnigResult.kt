@@ -27,7 +27,7 @@ import org.joni.Region
 class OnigResult(val region: Region, var indexInScanner: Int) {
 
     fun locationAt(index: Int): Int {
-        val bytes = region.beg[index]
+        val bytes = region.getBeg(index)
         if (bytes > 0) {
             return bytes
         }
@@ -37,7 +37,7 @@ class OnigResult(val region: Region, var indexInScanner: Int) {
     val count = region.numRegs
 
     fun lengthAt(index: Int): Int {
-        val bytes = region.end[index] - region.beg[index]
+        val bytes = region.getEnd(index) - region.getBeg(index)
         if (bytes > 0) {
             return bytes
         }

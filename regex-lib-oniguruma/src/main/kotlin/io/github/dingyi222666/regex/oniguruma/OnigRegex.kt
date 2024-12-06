@@ -172,21 +172,21 @@ class OnigRegex(
 
         val region = nativeMatchResult.region
         val groups = Array(nativeMatchResult.count) {
-            val byteContent = ByteArray(region.end[it] - region.beg[it]) { i ->
-                onigStr.bytesUTF8[region.beg[it] + i]
+            val byteContent = ByteArray(region.getEnd(it) - region.getBeg(it)) { i ->
+                onigStr.bytesUTF8[region.getBeg(it) + i]
             }
             MatchGroup(
                 String(byteContent, Charsets.UTF_8), IntRange(
-                    onigStr.getCharIndexOfByte(max(0, region.beg[it])),
-                    onigStr.getCharIndexOfByte(max(0, region.end[it])) - 1
+                    onigStr.getCharIndexOfByte(max(0, region.getBeg(it))),
+                    onigStr.getCharIndexOfByte(max(0, region.getEnd(it))) - 1
                 )
             )
         }
 
         val resultRange =
             IntRange(
-                onigStr.getCharIndexOfByte(max(0, region.beg[0])),
-                onigStr.getCharIndexOfByte(max(0, region.end[0])) - 1
+                onigStr.getCharIndexOfByte(max(0, region.getBeg(0))),
+                onigStr.getCharIndexOfByte(max(0, region.getEnd(0))) - 1
             )
         return MatchResult(
             onigStr.content.substring(resultRange),
