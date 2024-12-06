@@ -49,6 +49,9 @@ class OnigRegex(
             .removePrefix("\\G")
             .toByteArray(StandardCharsets.UTF_8)
 
+        val defaultPattern = "\$"
+            .toByteArray(StandardCharsets.UTF_8)
+
         val option = Option.CAPTURE_GROUP or options.map { it.toOnigRegexOption() }.toInt()
         kotlin.runCatching {
             NativeRegex(
@@ -61,16 +64,28 @@ class OnigRegex(
                 WarnCallback.DEFAULT
             )
         }.getOrElse {
-
-            NativeRegex(
-                removeGlobalPattern,
-                0,
-                removeGlobalPattern.size,
-                option,
-                UTF8Encoding.INSTANCE,
-                Syntax.Grep,
-                WarnCallback.DEFAULT
-            )
+            runCatching {
+                NativeRegex(
+                    removeGlobalPattern,
+                    0,
+                    removeGlobalPattern.size,
+                    option,
+                    UTF8Encoding.INSTANCE,
+                    Syntax.Grep,
+                    WarnCallback.DEFAULT
+                )
+            }.getOrElse {
+                // from https://github.com/JetBrains/intellij-community/blob/881c9bc397b850bad1d393a67bcbc82861d55d79/plugins/textmate/core/src/org/jetbrains/plugins/textmate/regex/joni/JoniRegexFactory.kt#L32
+                NativeRegex(
+                    defaultPattern,
+                    0,
+                    defaultPattern.size,
+                    option,
+                    UTF8Encoding.INSTANCE,
+                    Syntax.Grep,
+                    WarnCallback.DEFAULT
+                )
+            }
         }
     }
 
